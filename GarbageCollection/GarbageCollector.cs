@@ -6,7 +6,7 @@ namespace Rainbow.GarbageCollection;
 
 public unsafe class GarbageCollector
 {
-    public List<StackBlock> stack { get; set; } = new(); //TODO : FreeStack(int index); FreeAllStacks();
+    public StackBlock stack { get; set; } = new(); //TODO : FreeStack(int index); FreeAllStacks();
     public List<Block<byte>> refs { get; set; } = new();
 
     public GarbageCollector(int size = 4096 * 1024)
@@ -20,14 +20,14 @@ public unsafe class GarbageCollector
         //Console.WriteLine((int)stackmem._ref);
 
         StackBlock st = new StackBlock(stackmem);
-        stack.Add(st);
+        stack = st;
     }
 
     public void FreeRootStack()
     {
         foreach(Block<byte> r in refs)
         {
-            if(r._ref == stack[0].mem._ref)
+            if(r._ref == stack.mem._ref)
             {
                 ForceFree<byte>(r._ref);
             }
@@ -93,17 +93,16 @@ public unsafe class GarbageCollector
     {
         List<Block<byte>> ret = new();
 
-        for(int x = 0; x < stack.Count; x++)
+        ret.Add(stack.mem);
+        for (int i = 0; i < stack.ptrs.Count; i++)
         {
-            ret.Add(stack[x].mem);
-            for(int i = 0; i < stack[x].ptrs.Count; i++)
+            if (!stack.ptrs[i].Key)
             {
-                if(!stack[x].ptrs[i].Key)
-                {
-                    ret.Add(stack[x].ptrs[i].Value);
-                } else if(stack[x].ptrs[i].Value.isref) {
-                    ret.AddRange(SearchCollectable(stack[x].ptrs[i].Value));
-                }
+                ret.Add(stack.ptrs[i].Value);
+            }
+            else if (stack.ptrs[i].Value.isref)
+            {
+                ret.AddRange(SearchCollectable(stack.ptrs[i].Value));
             }
         }
 
@@ -147,13 +146,13 @@ public unsafe class GarbageCollector
         if(isref)
         {
             refs = refs.Where(x => !x.Equals(ptr)).ToList();
-            stack[0].PushRef(ref ptr);
+            stack.PushRef(ref ptr);
 
-            Console.WriteLine("Freeing :: " + (int)ptr._ref + " Realloced to: " + (int)stack[0].ptrs[stack[0].ptrs.Count - 1].Value._ref);
+            Console.WriteLine("Freeing :: " + (int)ptr._ref + " Realloced to: " + (int)stack.ptrs[stack.ptrs.Count - 1].Value._ref);
             ForceFree<byte>(ptr);
         } else
         {
-            stack[0].Push(ref ptr);
+            stack.Push(ref ptr);
         }
     }
 }

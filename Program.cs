@@ -45,14 +45,10 @@ class Program {
 
         gc.Collect(); //no collections
 
-        gc.stack[0].StackAlloc<int>(false, 2);
-        gc.stack[0].StackAlloc<int>(false, 2);
-        gc.stack[0].StackAlloc<int>(false, 2);
-        gc.stack[0].StackAlloc<int>(false, 2);
-        gc.stack[0].StackAlloc<int>(false, 2);
-        gc.stack[0].StackAlloc<int>(false, 2);
+        gc.stack.StackAlloc<byte>(false, 20);
+        gc.stack.StackAlloc<byte>(false, 20);
 
-        gc.stack[0].Pop();
+        gc.stack.Pop();
 
         Console.WriteLine("=========================================");
 
