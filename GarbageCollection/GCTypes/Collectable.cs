@@ -85,4 +85,12 @@ public unsafe struct StackBlock
 
         Console.WriteLine("Popping value off of stack.");
     }
+
+    public Block<byte> CopyTo(ref Block<byte> tocopy)
+    {
+        Block<byte> alloc = StackAlloc<byte>(false, tocopy.length);
+        alloc._ref = tocopy._ref;
+
+        return alloc;
+    }
 }
