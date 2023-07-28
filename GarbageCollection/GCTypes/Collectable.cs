@@ -88,9 +88,9 @@ public unsafe struct StackBlock
 
     public Block<byte> CopyTo(ref Block<byte> tocopy)
     {
-        Block<byte> alloc = StackAlloc<byte>(false, tocopy.length);
-        alloc._ref = tocopy._ref;
+        Block<Block<byte>> alloc = StackAlloc<Block<byte>>(true, sizeof(Block<byte>));
+        alloc.SetPos(0, tocopy);
 
-        return alloc;
+        return alloc[0];
     }
 }

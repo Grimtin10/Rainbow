@@ -142,7 +142,7 @@ namespace Rainbow.Execution {
                     string name = GetSTR(args, ref index);
                     byte[] bytes = GetBytes(args, type, ref index);
                     Block<byte> data = Globals.GarbageCollector.Alloc(bytes.Length);
-                    Globals.GarbageCollector.PushStack(data, true);
+                    data = Globals.GarbageCollector.stack.CopyTo(ref data);
                     for(int i=0;i<bytes.Length;i++) {
                         data.SetPos(i, bytes[i]);
                     }

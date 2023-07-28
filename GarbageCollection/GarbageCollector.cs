@@ -72,15 +72,15 @@ public unsafe class GarbageCollector
         List<Block<byte>> reachable = FindReachable();
         List<int> freedAddrs = new();
 
-        //Console.WriteLine(reachable.Count + " " + refs.Count);
+        Console.WriteLine("lengths: " + reachable.Count + " " + refs.Count);
 
         for(int i = 0; i < refs.Count; i++)
         {
-            //Console.WriteLine(refs[i].ToString());
+            //Console.WriteLine("ref: " + refs[i].ToString());
             if(Contains(reachable, refs[i]))
             {
                 Console.WriteLine("Not Freeing : " + (int)refs[i]._ref);
-            } else if(!freedAddrs.Contains((int)refs[i]._ref) && !reachable.Contains(refs[i])) {
+            } else if(!freedAddrs.Contains((int)refs[i]._ref)) {
                 Console.WriteLine("Freeing : " + (int)refs[i]._ref);
                 freedAddrs.Add((int)refs[i]._ref);
                 ForceFree<byte>(refs[i]);
@@ -97,13 +97,12 @@ public unsafe class GarbageCollector
         ret.Add(stack.mem);
         for (int i = 0; i < stack.ptrs.Count; i++)
         {
-            if (!stack.ptrs[i].Key)
-            {
-                ret.Add(stack.ptrs[i].Value);
-            }
-            else if (stack.ptrs[i].Value.isref)
-            {
+            if(stack.ptrs[i].Value.isref) {
+                Console.WriteLine("was ref, searching deeper");
                 ret.AddRange(SearchCollectable(stack.ptrs[i].Value));
+            } else {
+                Console.WriteLine("wasnt ref");
+                ret.Add(stack.ptrs[i].Value);
             }
         }
 
@@ -136,8 +135,9 @@ public unsafe class GarbageCollector
     }
 
     private bool Contains(List<Block<byte>> blocks, Block<byte> block) {
-        foreach(Block<byte> b in blocks) { 
-            if(b.Equals(block)) return true;
+        foreach(Block<byte> b in blocks) {
+            //Console.WriteLine("b: " + b.ToString());
+            if(block.Equals(b)) return true;
         }
         return false;
     }
