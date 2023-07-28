@@ -72,7 +72,7 @@ public unsafe class GarbageCollector
         List<Block<byte>> reachable = FindReachable();
         List<int> freedAddrs = new();
 
-        Console.WriteLine("lengths: " + reachable.Count + " " + refs.Count);
+        //Console.WriteLine("lengths: " + reachable.Count + " " + refs.Count);
 
         for(int i = 0; i < refs.Count; i++)
         {
@@ -98,10 +98,10 @@ public unsafe class GarbageCollector
         for (int i = 0; i < stack.ptrs.Count; i++)
         {
             if(stack.ptrs[i].Value.isref) {
-                Console.WriteLine("was ref, searching deeper");
+                //Console.WriteLine("was ref, searching deeper");
                 ret.AddRange(SearchCollectable(stack.ptrs[i].Value));
             } else {
-                Console.WriteLine("wasnt ref");
+                //Console.WriteLine("wasnt ref");
                 ret.Add(stack.ptrs[i].Value);
             }
         }
@@ -116,20 +116,20 @@ public unsafe class GarbageCollector
 
         //ret.Add(collectable);
 
-        Console.WriteLine(collectable.ToString());
+        //Console.WriteLine(collectable.ToString());
 
         if(collectable.isref)
         {
-            Console.WriteLine("was ref, searching deeper");
+            //Console.WriteLine("was ref, searching deeper");
 
             Block<Block<byte>> ptrtptr = collectable.MarshalBlock<Block<byte>>();
             ret.AddRange(SearchCollectable(ptrtptr[0]));
         } else {
-            Console.WriteLine("wasnt ref");
+            //Console.WriteLine("wasnt ref");
             ret.Add(collectable);
         }
 
-        Console.WriteLine(ret.Count);
+        //Console.WriteLine(ret.Count);
 
         return ret;
     }

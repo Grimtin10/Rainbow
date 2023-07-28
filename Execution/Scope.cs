@@ -96,7 +96,11 @@ namespace Rainbow.Execution {
                     Console.Write(b.ToString("X2") + " ");
                 }
                 Console.WriteLine();
-                ExecInstruction(instruction);
+                if(ExecInstruction(instruction)) {
+                    // we returned, stop execution
+                    Cleanup();
+                    return;
+                }
             }
 
             foreach(Scope scope in scopes) {
@@ -126,7 +130,7 @@ namespace Rainbow.Execution {
             Globals.GarbageCollector.Collect();
         }
 
-        private void ExecInstruction(KeyValuePair<Instruction, byte[]> instruction) {
+        private bool ExecInstruction(KeyValuePair<Instruction, byte[]> instruction) {
             Instruction instr = instruction.Key;
             byte[] args = instruction.Value;
 
@@ -134,8 +138,8 @@ namespace Rainbow.Execution {
 
             switch((byte)instr) {
                 case 0x2F: {
-
-                    break;
+                    // TODO: actually get return value
+                    return true;
                 }
                 case 0x39: { // VALUE
                     byte type = args[index++];
@@ -158,6 +162,8 @@ namespace Rainbow.Execution {
                 default:
                     throw new UnhandledArgumentException($"Unhandled instruction {instr} (0x{(byte) instr:X2})");
             }
+
+            return false;
         }
 
         public Instance? GetRef(string name) {

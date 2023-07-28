@@ -61,9 +61,8 @@ public unsafe struct StackBlock
             throw new StackOverflowException("Allocated memory is larger than the stack!");
         }
 
-        Console.WriteLine(sizeof(T) * size);
         Block<byte> obj = new Block<byte>(start, sizeof(T) * size);
-        pos = pos + (size * sizeof(T)); Console.WriteLine("New pos is: " + pos);
+        pos = pos + (size * sizeof(T));
         obj.isref = blockIsRef;
 
         Console.WriteLine("Allocated on stack: " + obj.ToString());
