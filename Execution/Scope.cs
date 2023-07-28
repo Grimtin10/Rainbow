@@ -120,7 +120,7 @@ namespace Rainbow.Execution {
             while(Globals.GarbageCollector.stack.ptrs.Count > stackStart) {
                 Globals.GarbageCollector.stack.Pop();
             }
-            if(isGlobal) { 
+            if(isGlobal) {
                 Globals.GarbageCollector.FreeRootStack();
             }
             Globals.GarbageCollector.Collect();
@@ -142,7 +142,7 @@ namespace Rainbow.Execution {
                     string name = GetSTR(args, ref index);
                     byte[] bytes = GetBytes(args, type, ref index);
                     Block<byte> data = Globals.GarbageCollector.Alloc(bytes.Length);
-                    Globals.GarbageCollector.stack.PushRef(ref data);
+                    Globals.GarbageCollector.PushStack(data, true);
                     for(int i=0;i<bytes.Length;i++) {
                         data.SetPos(i, bytes[i]);
                     }

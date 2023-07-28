@@ -25,6 +25,7 @@ public unsafe class GarbageCollector
 
     public void FreeRootStack()
     {
+        Console.WriteLine("Freeing root stack.");
         foreach(Block<byte> r in refs)
         {
             if(r._ref == stack.mem._ref)
