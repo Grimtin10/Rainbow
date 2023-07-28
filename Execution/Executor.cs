@@ -12,6 +12,7 @@ namespace Rainbow.Execution {
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             globalScope = new Scope(program, null);
+            globalScope.isGlobal = true;
             stopwatch.Stop();
 
             Console.WriteLine("Parsing program took " + stopwatch.ElapsedMilliseconds + "ms");
@@ -19,13 +20,6 @@ namespace Rainbow.Execution {
 
         public void Execute() {
             globalScope.Execute();
-
-            Function? mainFunc;
-            if(!globalScope.functions.TryGetValue("main", out mainFunc)) {
-                throw new Exception("No main function found! Create a main function to run the program.");
-            }
-
-            mainFunc.Execute();
         }
     }
 }

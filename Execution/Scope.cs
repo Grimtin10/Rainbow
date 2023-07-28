@@ -20,6 +20,10 @@ namespace Rainbow.Execution {
         public List<Scope> scopes = new();
         public Scope? parentScope;
 
+        public int stackStart;
+
+        public bool isGlobal = false;
+
         public Scope(byte[] bytes, Scope? parentScope) {
             this.parentScope = parentScope;
 
@@ -84,6 +88,8 @@ namespace Rainbow.Execution {
         }
 
         public void Execute() {
+            stackStart = Globals.GarbageCollector.stack.ptrs.Count;
+
             foreach(KeyValuePair<Instruction, byte[]> instruction in instructions) {
                 Console.Write(instruction.Key.ToString() + " ");
                 foreach(byte b in instruction.Value) {
@@ -92,9 +98,32 @@ namespace Rainbow.Execution {
                 Console.WriteLine();
                 ExecInstruction(instruction);
             }
+
             foreach(Scope scope in scopes) {
                 scope.Execute();
             }
+
+            if(isGlobal) {
+                Function? mainFunc;
+                if(!functions.TryGetValue("main", out mainFunc)) {
+                    throw new Exception("No main function found! Create a main function to run the program.");
+                }
+
+                mainFunc.Execute();
+            }
+
+            Cleanup();
+        }
+
+        private void Cleanup() {
+            Console.WriteLine("Cleaning up scope");
+            while(Globals.GarbageCollector.stack.ptrs.Count > stackStart) {
+                Globals.GarbageCollector.stack.Pop();
+            }
+            if(isGlobal) {
+                Globals.GarbageCollector.FreeRootStack();
+            }
+            Globals.GarbageCollector.Collect();
         }
 
         private void ExecInstruction(KeyValuePair<Instruction, byte[]> instruction) {
@@ -105,6 +134,7 @@ namespace Rainbow.Execution {
 
             switch((byte)instr) {
                 case 0x2F: {
+
                     break;
                 }
                 case 0x39: { // VALUE
@@ -112,7 +142,7 @@ namespace Rainbow.Execution {
                     string name = GetSTR(args, ref index);
                     byte[] bytes = GetBytes(args, type, ref index);
                     Block<byte> data = Globals.GarbageCollector.Alloc(bytes.Length);
-                    Globals.GarbageCollector.stack.Push(ref data);
+                    Globals.GarbageCollector.PushStack(data, true);
                     for(int i=0;i<bytes.Length;i++) {
                         data.SetPos(i, bytes[i]);
                     }

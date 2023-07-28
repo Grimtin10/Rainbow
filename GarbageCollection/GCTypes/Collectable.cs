@@ -82,5 +82,7 @@ public unsafe struct StackBlock
         pos = pos - (ptrs[ptrs.Count - 1].Value.length * sizeof(byte));
 
         ptrs.RemoveAt(ptrs.Count - 1);
+
+        Console.WriteLine("Popping value off of stack.");
     }
 }
