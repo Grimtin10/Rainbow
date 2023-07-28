@@ -236,6 +236,7 @@ namespace Rainbow.Execution {
             return result;
         }
 
+        // dont look at this
         private KeyValuePair<Instruction, byte[]> ParseInstruction(byte[] bytes, ref int i) {
             byte instr = bytes[i];
             byte[] args;
