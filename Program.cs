@@ -23,31 +23,42 @@ class Program {
         System.Diagnostics.Stopwatch watch = new();
         GarbageCollector gc = new();
 
-        Block<byte> test1 = gc.Alloc(5);
-        gc.stack[0].PushRef(ref test1);
+        //Block<byte> test1 = gc.Alloc(5);
+        //gc.PushStack(test1, true);
 
-        Block<byte> test2 = gc.Alloc(5);
-        gc.stack[0].PushRef(ref test2);
+        //Block<byte> test2 = gc.Alloc(5);
+        //gc.PushStack(test2);
 
-        Block<byte> ptr1 = gc.Alloc(sizeof(Block<Block<byte>>));
+        Block<byte> ptr1 = gc.Alloc(sizeof(Block<Block<byte>>)); Console.WriteLine("Ptr1 Pos: " + (int)ptr1._ref);
         ptr1.isref = true;
-        Block<byte> ptr2 = gc.Alloc(sizeof(int));
+        Block<byte> ptr2 = gc.Alloc(sizeof(int)); Console.WriteLine("Ptr2 Pos: " + (int)ptr2._ref);
+        ptr2.SetPos(0, 5);
 
         ptr1.SetPos(0, ptr2[0]);
+        ptr1.MarshalBlock<Block<byte>>().SetPos(0, ptr2);
 
         //Block<Block<byte>> pptr1 = ptr1.MarshalBlock<Block<Block<byte>>>()[0];
         //pptr1.SetPos(0, gc.Alloc(sizeof(int)));
 
         Console.WriteLine(ptr1.isref);
-        gc.stack[0].PushRef(ref ptr1);
+        gc.PushStack(ptr1, true);
 
         gc.Collect(); //no collections
+
+        gc.stack[0].StackAlloc<int>(false, 2);
+        gc.stack[0].StackAlloc<int>(false, 2);
+        gc.stack[0].StackAlloc<int>(false, 2);
+        gc.stack[0].StackAlloc<int>(false, 2);
+        gc.stack[0].StackAlloc<int>(false, 2);
+        gc.stack[0].StackAlloc<int>(false, 2);
 
         gc.stack[0].Pop();
 
         Console.WriteLine("=========================================");
 
         gc.Collect(); //1 collection
+
+        Console.WriteLine("Segfault avoided!");
 
         /*
         watch.Start();

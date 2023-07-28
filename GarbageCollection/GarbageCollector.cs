@@ -1,4 +1,5 @@
 using Rainbow.GarbageCollection.GCTypes;
+using System;
 using System.Runtime.InteropServices;
 
 namespace Rainbow.GarbageCollection;
@@ -74,7 +75,7 @@ public unsafe class GarbageCollector
 
         for(int i = 0; i < refs.Count; i++)
         {
-            Console.WriteLine(refs[i].ToString());
+            //Console.WriteLine(refs[i].ToString());
             if(Contains(reachable, refs[i]))
             {
                 Console.WriteLine("Not Freeing : " + (int)refs[i]._ref);
@@ -114,17 +115,19 @@ public unsafe class GarbageCollector
     {
         List<Block<byte>> ret = new();
 
-        ret.Add(collectable);
+        //ret.Add(collectable);
 
         Console.WriteLine(collectable.ToString());
 
         if(collectable.isref)
         {
             Console.WriteLine("was ref, searching deeper");
-            Block<byte> b = new Block<byte>(collectable._ref, sizeof(byte *));
-            ret.AddRange(SearchCollectable(b));
+
+            Block<Block<byte>> ptrtptr = collectable.MarshalBlock<Block<byte>>();
+            ret.AddRange(SearchCollectable(ptrtptr[0]));
         } else {
             Console.WriteLine("wasnt ref");
+            ret.Add(collectable);
         }
 
         Console.WriteLine(ret.Count);
@@ -137,5 +140,20 @@ public unsafe class GarbageCollector
             if(b.Equals(block)) return true;
         }
         return false;
+    }
+
+    public void PushStack(Block<byte> ptr, bool isref = false)
+    { 
+        if(isref)
+        {
+            refs = refs.Where(x => !x.Equals(ptr)).ToList();
+            stack[0].PushRef(ref ptr);
+
+            Console.WriteLine("Freeing :: " + (int)ptr._ref + " Realloced to: " + (int)stack[0].ptrs[stack[0].ptrs.Count - 1].Value._ref);
+            ForceFree<byte>(ptr);
+        } else
+        {
+            stack[0].Push(ref ptr);
+        }
     }
 }

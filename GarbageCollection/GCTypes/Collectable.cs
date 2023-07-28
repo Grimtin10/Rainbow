@@ -3,26 +3,6 @@ using System.Runtime.InteropServices;
 
 namespace Rainbow.GarbageCollection.GCTypes;
 
-public interface ICollectable
-{
-    public ICollectable? _ref { get; set; }
-    public Block<byte> ptr { get; set; }
-    public bool ContainsRefs { get; set; }
-    public bool marked { get; set; }
-}
-
-
-public unsafe struct Collectable
-{
-    public Block<byte> ptr { get; set; }
-    public bool ContainsRefs { get; set; } = true;
-
-    public Collectable(Block<byte> mem)
-    {
-        ptr = mem;
-    }
-}
-
 public unsafe struct StackBlock
 {
     public Block<byte> mem { get; set; }
@@ -70,32 +50,21 @@ public unsafe struct StackBlock
         return bt;
     }
 
-    public Block<byte> PushRef(ref Collectable ptr)
-    { 
-        Block<byte> bt = StackAlloc<byte>(ptr.ptr.isref, sizeof(Collectable), true);
-        Block<Collectable> collptr = bt.MarshalBlock<Collectable>();
-
-        collptr.SetPos(0, ptr);
-
-        currentBlockSize = bt.length;
-
-        return bt;
-    }
-
     public Block<T> StackAlloc<T>(bool blockIsRef, int size = 1, bool isref = false) where T: unmanaged
     {
-        byte *start = &mem._ref[pos];
+        byte *start = (byte *)((long)mem._ref + pos);
         
         if((mem.length - pos) + (sizeof(T) * size) < mem.length)
         {
             throw new StackOverflowException("Allocated memory is larger than the stack!");
         }
 
+        Console.WriteLine(sizeof(T) * size);
         Block<byte> obj = new Block<byte>(start, sizeof(T) * size);
-        pos = pos + obj.length;
+        pos = pos + (size * sizeof(T)); Console.WriteLine(pos);
         obj.isref = blockIsRef;
 
-        Console.WriteLine("stackalloc: " + obj.ToString());
+        Console.WriteLine("Allocated on stack: " + obj.ToString());
         ptrs.Add(new(isref, obj));
 
         return obj.MarshalBlock<T>();

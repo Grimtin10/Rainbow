@@ -9,7 +9,8 @@ public unsafe struct Block<T> : IDisposable where T : unmanaged
     public int length { get; set; }
     public bool isref { get; set; } = false;
 
-    public T this[int index] {
+    public T this[int index] 
+    {
         get {
             if(index >= length) {
                 throw new Exception("Unable to read memory!");
@@ -19,7 +20,8 @@ public unsafe struct Block<T> : IDisposable where T : unmanaged
         }
     }
 
-    public Block(T* ptr, int len) {
+    public Block(T* ptr, int len) 
+    {
         this._ref = ptr;
         this.length = len;
     }
@@ -73,9 +75,15 @@ public unsafe static class BlockExtensions {
         return bld.ToString();
     }
 
-    public static Block<T> MarshalBlock<T>(this Block<byte> blk) where T: unmanaged
+    public static Block<T> MarshalBlock<T>(this Block<byte> blk, int forcedlen = 0) where T: unmanaged
     {
-        return new Block<T>((T *)blk._ref, blk.length / sizeof(T));
+        if(forcedlen > 0)
+        {
+            return new Block<T>((T*)blk._ref, forcedlen);
+        } else
+        {
+            return new Block<T>((T*)blk._ref, blk.length / sizeof(T));
+        }
     }
 
     public static Block<byte> GetBlockBytes<T>(this Block<T> blk) where T: unmanaged
