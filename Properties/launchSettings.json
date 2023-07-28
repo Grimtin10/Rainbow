@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Rainbow": {
+      "commandName": "Project",
+      "commandLineArgs": "nightly\r\nC:\\Users\\Grim\\source\\repos\\Rainbow\\Rainbow\\Examples\\HelloWorld.rbb"
+    }
+  }
+}
