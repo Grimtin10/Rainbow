@@ -75,6 +75,12 @@ public unsafe static class BlockExtensions {
         return bld.ToString();
     }
 
+    public static void FillBytes(this Block<byte> blk, byte[] bytes) {
+        for(int i = 0; i < bytes.Length; i++) {
+            blk.SetPos(i, bytes[i]);
+        }
+    }
+
     public static Block<T> MarshalBlock<T>(this Block<byte> blk, int forcedlen = 0) where T: unmanaged
     {
         if(forcedlen > 0)

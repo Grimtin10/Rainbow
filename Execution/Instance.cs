@@ -15,5 +15,13 @@ namespace Rainbow.Execution {
             this.type = type;
             this.data = data;
         }
+
+        public void SetPos(int i, byte b) { 
+            data.SetPos(i, b);
+        }
+
+        public void FillBytes(byte[] bytes) { 
+            data.FillBytes(bytes);
+        }
     }
 }

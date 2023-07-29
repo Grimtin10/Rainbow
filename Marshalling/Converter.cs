@@ -1,8 +1,10 @@
+using System.Text;
+
 namespace Rainbow.Marshalling;
 
 public static class Marshalling
 {
-    public static float ToFloat(byte[] arr)
+    public static float ToFloat32(byte[] arr)
     {
         return BitConverter.ToSingle(arr, 0);
     }
@@ -62,8 +64,51 @@ public static class Marshalling
         return BitConverter.ToInt64(arr, 0);
     }
 
-    public static string ToString(byte[] arr)
-    {
-        return System.Text.Encoding.UTF8.GetString(arr);
+    public static string ToString(byte[] arr) {
+        return Encoding.UTF8.GetString(arr);
     }
+
+    // these are all just wrapper functions
+    // they make my code shorter so
+    #region getbytes
+    public static byte[] GetBytes(short b) {
+        return BitConverter.GetBytes(b);
+    }
+
+    public static byte[] GetBytes(int b) {
+        return BitConverter.GetBytes(b);
+    }
+
+    public static byte[] GetBytes(long b) {
+        return BitConverter.GetBytes(b);
+    }
+
+    public static byte[] GetBytes(ushort b) {
+        return BitConverter.GetBytes(b);
+    }
+
+    public static byte[] GetBytes(uint b) {
+        return BitConverter.GetBytes(b);
+    }
+
+    public static byte[] GetBytes(ulong b) {
+        return BitConverter.GetBytes(b);
+    }
+
+    public static byte[] GetBytes(half b) {
+        return BitConverter.GetBytes(b);
+    }
+
+    public static byte[] GetBytes(float b) {
+        return BitConverter.GetBytes(b);
+    }
+
+    public static byte[] GetBytes(double b) {
+        return BitConverter.GetBytes(b);
+    }
+
+    public static byte[] GetBytes(string b) {
+        return Encoding.UTF8.GetBytes(b);
+    }
+    #endregion
 }

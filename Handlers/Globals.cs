@@ -1,4 +1,5 @@
 ﻿global using half = System.Half;
+global using conv = Rainbow.Marshalling.Marshalling;
 
 using Rainbow.GarbageCollection;
 
