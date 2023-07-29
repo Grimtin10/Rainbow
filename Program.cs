@@ -24,15 +24,26 @@ class Program {
         System.Diagnostics.Stopwatch watch = new();
         GarbageCollector gc = new();
 
-        AllocationEngine eng = new(ref gc, true);
+        for(int i = 0; i < 10; i++)
+        {
+            Block<byte> b = gc.Alloc(2048);
+        }
+
+        Block<byte> ptr = gc.Alloc(40);
+        gc.stack.CopyTo(ref ptr);
+        //gc.stack.CopyTo(ref b);
+
+        gc.canCollect = true;
+
+        watch.Start();
+        gc.Collect();
+        watch.Stop();
+
+        Console.WriteLine("Elapsed Time: " + watch.Elapsed.TotalMilliseconds);
+
+        gc.stack.Pop();
+        gc.Collect();
         
-        Block<byte> x = eng.AllocSimple(1023);
-        gc.stack.CopyTo(ref x);
-
-        Block<byte> y = eng.AllocSimple(2);
-
-        Thread.Sleep(2000);
-        eng.Dispose();
         //Block<byte> x = gc.Alloc(1023);
     }
 }

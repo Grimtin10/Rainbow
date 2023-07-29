@@ -12,6 +12,7 @@ public class AllocationEngine
     public AllocationQueue queue { get; set; } = new();
     public bool runThreadedCollection { get; set; }
     public GarbageCollector gc { get; set; }
+    public Thread? gcthread { get; set; }
 
     public AllocationEngine(ref GarbageCollector gc, bool threadedcollection = false)
     {
@@ -47,9 +48,15 @@ public class AllocationEngine
 
     public Block<byte> AllocateAndFinalize(int size)
     {
+        bool cancol = gc.canCollect;
+
         Block<byte> alloced = gc.Alloc(size);
         Block<byte> ret = gc.stack.CopyTo(ref alloced);
-        gc.canCollect = true;
+        
+        if(cancol)
+        {
+            gc.canCollect = true;
+        }
 
         return ret;
     }
@@ -58,6 +65,8 @@ public class AllocationEngine
     {
         Thread thread = new(new ThreadStart(GarbageCollectionThread));
         thread.Start();
+
+        gcthread = thread;
     }
 
     public void GarbageCollectionThread()
@@ -89,5 +98,15 @@ public class AllocationEngine
     public void Dispose()
     {
         runThreadedCollection = false;
+    }
+
+    public void RuntimeSuspendGC()
+    {
+        gc.canCollect = false;
+    }
+
+    public void RuntimeEnableGC()
+    {
+        gc.canCollect = true;
     }
 }

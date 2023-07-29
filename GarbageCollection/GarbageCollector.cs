@@ -91,6 +91,7 @@ public unsafe class GarbageCollector
         {
             List<Block<byte>> reachable = FindReachable();
             List<int> freedAddrs = new();
+            List<Block<byte>> newrefs = new();
 
             //Console.WriteLine("lengths: " + reachable.Count + " " + refs.Count);
 
@@ -99,15 +100,26 @@ public unsafe class GarbageCollector
                 //Console.WriteLine("ref: " + refs[i].ToString());
                 if(Contains(reachable, refs[i]))
                 {
+                    newrefs.Add(refs[i]);
                     Console.WriteLine("Not Freeing : " + (int)refs[i]._ref);
                 } else if(!freedAddrs.Contains((int)refs[i]._ref)) {
                     Console.WriteLine("Freeing : " + (int)refs[i]._ref);
                     freedAddrs.Add((int)refs[i]._ref);
-                    ForceFree<byte>(refs[i]);
+                    ForceFree<byte>(refs[i]!);
                 }
             }
 
-            refs = refs.Where(x => reachable.Contains(x)).ToList();
+            if(collectionThreshold > 1024)
+            {
+                collectionThreshold = collectionThreshold / 2;
+            }
+
+            if(collectionThreshold < 1024)
+            {
+                collectionThreshold = 1024;
+            }
+
+            refs = newrefs;
         }
     }
 
@@ -170,7 +182,7 @@ public unsafe class GarbageCollector
             refs = refs.Where(x => !x.Equals(ptr)).ToList();
             stack.PushRef(ref ptr);
 
-            Console.WriteLine("Freeing :: " + (int)ptr._ref + " Realloced to: " + (int)stack.ptrs[stack.ptrs.Count - 1].Value._ref);
+            //Console.WriteLine("Freeing :: " + (int)ptr._ref + " Realloced to: " + (int)stack.ptrs[stack.ptrs.Count - 1].Value._ref);
             ForceFree<byte>(ptr);
         } else
         {
