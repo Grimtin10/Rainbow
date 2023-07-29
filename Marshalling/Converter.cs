@@ -4,6 +4,42 @@ namespace Rainbow.Marshalling;
 
 public static class Marshalling
 {
+    public static byte ToUInt8(byte[] arr) {
+        return arr[0];
+    }
+
+    public static ushort ToUInt16(byte[] arr) {
+        return BitConverter.ToUInt16(arr, 0);
+    }
+
+    public static uint ToUInt32(byte[] arr) {
+        return BitConverter.ToUInt32(arr, 0);
+    }
+
+    public static ulong ToUInt64(byte[] arr) {
+        return BitConverter.ToUInt64(arr, 0);
+    }
+
+    public static sbyte ToInt8(byte[] arr) {
+        return (sbyte) arr[0];
+    }
+
+    public static short ToInt16(byte[] arr) {
+        return BitConverter.ToInt16(arr, 0);
+    }
+
+    public static int ToInt32(byte[] arr) {
+        return BitConverter.ToInt32(arr, 0);
+    }
+
+    public static long ToInt64(byte[] arr) {
+        return BitConverter.ToInt64(arr, 0);
+    }
+
+    public static half ToFloat16(byte[] arr) {
+        return BitConverter.ToHalf(arr, 0);
+    }
+
     public static float ToFloat32(byte[] arr)
     {
         return BitConverter.ToSingle(arr, 0);
@@ -14,58 +50,12 @@ public static class Marshalling
         return BitConverter.ToDouble(arr, 0);
     }
 
-    public static char ToChar(byte[] arr)
-    {
-        return BitConverter.ToChar(arr, 0);
-    }
-
-    public static half ToFloat16(byte[] arr)
-    {
-        return BitConverter.ToHalf(arr, 0);
-    }
-
-    public static byte ToUint8(byte[] arr)
-    {
-        return arr[0];
-    }
-
-    public static ulong ToUint64(byte[] arr)
-    {
-        return BitConverter.ToUInt64(arr, 0);
-    }
-
-    public static uint ToUint32(byte[] arr)
-    {
-        return BitConverter.ToUInt32(arr, 0);
-    }
-
-    public static ushort ToUint16(byte[] arr)
-    {
-        return BitConverter.ToUInt16(arr, 0);
-    }
-
-    public static sbyte ToInt8(byte[] arr)
-    {
-        return (sbyte)arr[0];
-    }
-
-    public static long ToInt16(byte[] arr)
-    {
-        return BitConverter.ToInt16(arr, 0);
-    }
-
-    public static int ToInt32(byte[] arr)
-    {
-        return BitConverter.ToInt32(arr, 0);
-    }
-
-    public static long ToInt64(byte[] arr)
-    {
-        return BitConverter.ToInt64(arr, 0);
-    }
-
     public static string ToString(byte[] arr) {
         return Encoding.UTF8.GetString(arr);
+    }
+
+    public static char ToChar(byte[] arr) {
+        return (char) arr[0]; // i'd use bitconverter but chars arer UTF-16 so
     }
 
     // these are all just wrapper functions

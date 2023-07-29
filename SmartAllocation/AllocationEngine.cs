@@ -77,6 +77,14 @@ public class AllocationEngine
                 gc.Collect();
             }
 
+            if(gc.collectionThreshold > 1024) {
+                gc.collectionThreshold -= gc.collectionThreshold >> 3;
+            }
+
+            if(gc.collectionThreshold < 1024) {
+                gc.collectionThreshold = 1024;
+            }
+
             if(queue.allocs.Count > 0)
             {
                 foreach(Block<byte> inf in queue.allocs)

@@ -1,30 +1,14 @@
 ﻿using Rainbow.Exceptions;
-using Rainbow.GarbageCollection.GCTypes;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Rainbow.Execution {
-    internal class Arithmetic {
-        #region addition
-        public static void Add(byte type1, byte[] val1, byte type2, byte[] val2, ref Instance var) {
-            switch((Type) type1) {
-                case Type.uint8:
-                    AddUInt8(conv.ToUint8(val1), type2, val2, ref var);
-                    break;
-            }
-        }
-
-        public static void AddUInt8(byte val1, byte type2, byte[] val2, ref Instance var) {
-            switch((Type) type2) {
-                case Type.uint8: {
-                    byte v = conv.ToUint8(val2);
-                    SetUInt8((byte) (val1 + v), ref var);
-                    break;
-                }
-            }
-        }
-        #endregion
-
-        // are you ready for the pain?
-        #region set
+    // this is literally implicit type conversion
+    // TODO: all this shit is untested pls test
+    internal class Move {
         public static void SetUInt8(byte val, ref Instance var) {
             switch(var.type) {
                 case Type.uint8:
@@ -226,7 +210,7 @@ namespace Rainbow.Execution {
                     break;
                 }
                 case Type._char: {
-                    var.SetPos(0, (byte)val);
+                    var.SetPos(0, (byte) val);
                     break;
                 }
             }
@@ -587,6 +571,6 @@ namespace Rainbow.Execution {
                 }
             }
         }
-        #endregion
+
     }
 }

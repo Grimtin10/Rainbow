@@ -66,15 +66,6 @@ public unsafe static class BlockExtensions {
         return bld.ToString();
     }
 
-    public static string ReadString(this Block<byte> blk) {
-        StringBuilder bld = new();
-        for(int i = 0; i < blk.length; i++) {
-            bld.Append((char)blk[i]);
-        }
-
-        return bld.ToString();
-    }
-
     public static void FillBytes(this Block<byte> blk, byte[] bytes) {
         for(int i = 0; i < bytes.Length; i++) {
             blk.SetPos(i, bytes[i]);
@@ -95,5 +86,22 @@ public unsafe static class BlockExtensions {
     public static Block<byte> GetBlockBytes<T>(this Block<T> blk) where T: unmanaged
     {
         return new Block<byte>((byte *)blk._ref, blk.length * sizeof(T));
+    }
+
+    public static byte[] GetBytes(this Block<byte> blk) {
+        byte[] bytes = new byte[blk.length];
+        for(int i = 0; i < blk.length; i++) {
+            bytes[i] = blk[i];
+        }
+        return bytes;
+    }
+
+    public static string ReadString(this Block<byte> blk) {
+        StringBuilder bld = new();
+        for(int i = 0; i < blk.length; i++) {
+            bld.Append((char) blk[i]);
+        }
+
+        return bld.ToString();
     }
 }

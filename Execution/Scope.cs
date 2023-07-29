@@ -1,6 +1,8 @@
 ﻿using Rainbow.Exceptions;
+using Rainbow.Execution.Math;
 using Rainbow.GarbageCollection.GCTypes;
 using Rainbow.Handlers;
+using System;
 using System.Text;
 
 // TODO: split this into multiple files
@@ -141,6 +143,8 @@ namespace Rainbow.Execution {
                     if(var == null) {
                         throw new NullRefException();
                     }
+
+                    Arithmetic.Add(type1, bytes1, type2, bytes2, ref var);
                     break;
                 }
                 case 0x2F: {
@@ -197,12 +201,57 @@ namespace Rainbow.Execution {
                 case 0x00:
                     Instance? var = GetRef(args, ref index);
                     if(var == null) throw new NullRefException();
-
-                    Console.WriteLine(var.data.ReadString());
-
+                    HandleConout(ref var);
                     break;
                 default:
                     throw new UnhandledArgumentException($"Unhandled syscall {type:X2}");
+            }
+        }
+
+        private void HandleConout(ref Instance var) {
+            byte[] bytes = var.data.GetBytes();
+            switch(var.type) {
+                case Type.uint8:
+                    Console.WriteLine(conv.ToUInt8(bytes));
+                    break;
+                case Type.uint16:
+                    Console.WriteLine(conv.ToUInt16(bytes));
+                    break;
+                case Type.uint32:
+                    Console.WriteLine(conv.ToUInt32(bytes));
+                    break;
+                case Type.uint64:
+                    Console.WriteLine(conv.ToUInt64(bytes));
+                    break;
+                case Type.int8:
+                    Console.WriteLine(conv.ToInt8(bytes));
+                    break;
+                case Type.int16:
+                    Console.WriteLine(conv.ToInt16(bytes));
+                    break;
+                case Type.int32:
+                    Console.WriteLine(conv.ToInt32(bytes));
+                    break;
+                case Type.int64:
+                    Console.WriteLine(conv.ToInt64(bytes));
+                    break;
+                case Type.float16:
+                    Console.WriteLine(conv.ToFloat16(bytes));
+                    break;
+                case Type.float32:
+                    Console.WriteLine(conv.ToFloat32(bytes));
+                    break;
+                case Type.float64:
+                    Console.WriteLine(conv.ToFloat64(bytes));
+                    break;
+                case Type._string:
+                    Console.WriteLine(var.data.ReadString());
+                    break;
+                case Type._char:
+                    Console.WriteLine(conv.ToChar(bytes));
+                    break;
+                default:
+                    throw new UnsupportedException("Attempted to CONOUT var with unknown type " + var.type);
             }
         }
 

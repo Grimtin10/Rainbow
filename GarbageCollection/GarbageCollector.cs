@@ -41,6 +41,14 @@ public unsafe class GarbageCollector
 
     public Block<byte> Alloc(int size, bool alloccollect = true)
     {
+        if(collectionThreshold > 1024) {
+            collectionThreshold -= collectionThreshold >> 2;
+        }
+
+        if(collectionThreshold < 1024) {
+            collectionThreshold = 1024;
+        }
+
         if(size > collectionThreshold)
         {
             collectionThreshold = size + (size >> 1);
@@ -108,17 +116,15 @@ public unsafe class GarbageCollector
                 }
             }
 
-            if(collectionThreshold > 1024)
-            {
-                collectionThreshold = collectionThreshold / 2;
-            }
-
-            if(collectionThreshold < 1024)
-            {
-                collectionThreshold = 1024;
-            }
-
             refs = newrefs;
+        }
+
+        if(collectionThreshold > 1024) {
+            collectionThreshold -= collectionThreshold >> 1;
+        }
+
+        if(collectionThreshold < 1024) {
+            collectionThreshold = 1024;
         }
     }
 
