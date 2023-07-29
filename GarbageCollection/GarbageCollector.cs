@@ -8,10 +8,14 @@ public unsafe class GarbageCollector
 {
     public StackBlock stack { get; set; } = new(); //TODO : FreeStack(int index); FreeAllStacks();
     public List<Block<byte>> refs { get; set; } = new();
+    public int totalCollected = 0;
+    public int collectionThreshold { get; set; }
 
-    public GarbageCollector(int size = 4096 * 1024)
+    public GarbageCollector(int size = 4096 * 1024, int threshold = 1024)
     {
         AllocateStack(size);
+        this.totalCollected = 0;
+        this.collectionThreshold = threshold;
     }
 
     public void AllocateStack(int size = 1024)
@@ -35,15 +39,26 @@ public unsafe class GarbageCollector
         }
     }
 
-    public Block<byte> Alloc(int size)
+    public Block<byte> Alloc(int size, bool alloccollect = true)
     {
+        if(size > collectionThreshold)
+        {
+            collectionThreshold = size + (size >> 1);
+        }
+
         IntPtr iptr = Marshal.AllocHGlobal(size);
         byte *ptr = (byte *)iptr.ToPointer();
 
         Block<byte> mem = new Block<byte>(ptr, size);
-        
+        totalCollected = totalCollected + size;
+
         refs.Add(mem);
         
+        if(totalCollected >= collectionThreshold && alloccollect)
+        {
+            this.Collect();
+        }
+
         return mem;
     }
 

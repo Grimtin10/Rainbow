@@ -1,6 +1,7 @@
 ﻿using Rainbow.Execution;
 using Rainbow.GarbageCollection;
 using Rainbow.GarbageCollection.GCTypes;
+using Rainbow.SmartAllocation;
 
 namespace Rainbow;
 
@@ -23,46 +24,15 @@ class Program {
         System.Diagnostics.Stopwatch watch = new();
         GarbageCollector gc = new();
 
-        //Block<byte> test1 = gc.Alloc(5);
-        //gc.PushStack(test1, true);
+        AllocationEngine eng = new(ref gc, true);
+        
+        Block<byte> x = eng.AllocSimple(1023);
+        gc.stack.CopyTo(ref x);
 
-        //Block<byte> test2 = gc.Alloc(5);
-        //gc.PushStack(test2);
+        Block<byte> y = eng.AllocSimple(2);
 
-        Block<byte> ptr1 = gc.Alloc(sizeof(Block<Block<byte>>)); Console.WriteLine("Ptr1 Pos: " + (int)ptr1._ref);
-        ptr1.isref = true;
-        Block<byte> ptr2 = gc.Alloc(sizeof(int)); Console.WriteLine("Ptr2 Pos: " + (int)ptr2._ref);
-        ptr2.SetPos(0, 5);
-
-        ptr1.SetPos(0, ptr2[0]);
-        ptr1.MarshalBlock<Block<byte>>().SetPos(0, ptr2);
-
-        //Block<Block<byte>> pptr1 = ptr1.MarshalBlock<Block<Block<byte>>>()[0];
-        //pptr1.SetPos(0, gc.Alloc(sizeof(int)));
-
-        Console.WriteLine(ptr1.isref);
-        gc.PushStack(ptr1, true);
-
-        gc.Collect(); //no collections
-
-        gc.stack.StackAlloc<byte>(false, 20);
-        gc.stack.StackAlloc<byte>(false, 20);
-
-        gc.stack.Pop();
-
-        Console.WriteLine("=========================================");
-
-        gc.Collect(); //1 collection
-
-        Console.WriteLine("Segfault avoided!");
-
-        /*
-        watch.Start();
-        gc.PerformSynchronousCollection();
-        watch.Stop();*/
-
-        //Console.WriteLine("Collection Elapsed: " + watch.Elapsed.TotalMilliseconds);
-        //Console.WriteLine(gc.refs.Count);
-        //Console.WriteLine(gc.HasRef(r._ref));
+        Thread.Sleep(2000);
+        eng.Dispose();
+        //Block<byte> x = gc.Alloc(1023);
     }
 }

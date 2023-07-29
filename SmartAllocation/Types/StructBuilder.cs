@@ -1,15 +1,13 @@
 using Rainbow.GarbageCollection;
 
-namespace Rainbow.GarbageCollection.GCTypes;
+namespace Rainbow.SmartAllocation.Types;
 
 public class StructBuilder
 {
-    public GarbageCollector gc { get; set; }
-    public StructInfo info { get; set; }
+    public StructInfo info { get; set; } = StructInfo.Empty;
 
-    public StructBuilder(ref GarbageCollector gc, StructInfo info)
+    public StructBuilder(StructInfo info)
     {
-        this.gc = gc;
         this.info = info;
     }
 }
@@ -24,6 +22,8 @@ public class StructInfo
         this.totalSize = size;
         this.variableInfo = info;
     }
+
+    public static StructInfo Empty => new StructInfo(new(), 0);
 }
 
 public class VariableInfo
