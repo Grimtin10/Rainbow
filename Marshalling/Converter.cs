@@ -1,7 +1,5 @@
 namespace Rainbow.Marshalling;
 
-using half = Half;
-
 public static class Marshalling
 {
     public static float ToFloat(byte[] arr)

@@ -1,4 +1,6 @@
-﻿using Rainbow.GarbageCollection;
+﻿global using half = System.Half;
+
+using Rainbow.GarbageCollection;
 
 namespace Rainbow.Handlers {
     public class Globals {
