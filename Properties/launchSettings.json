@@ -2,7 +2,7 @@
   "profiles": {
     "Rainbow": {
       "commandName": "Project",
-      "commandLineArgs": "C:\\Users\\Grim\\source\\repos\\Rainbow\\Rainbow\\Examples\\HelloWorld.rbb"
+      "commandLineArgs": "C:\\Users\\Grim\\source\\repos\\Rainbow\\Rainbow\\Examples/Add2/add2.rbb"
     }
   }
 }

@@ -1,0 +1,6 @@
+uint32 main(string* args) {
+	VARDEF $res
+	ADD 7, 4, $res
+	SYSCALL CONOUT $res
+	RET 0
+}

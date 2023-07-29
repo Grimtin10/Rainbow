@@ -128,5 +128,6 @@
         VALUE,
         SYSCALL_R,
         SYSCALL_I,
+        VARDEF,
     }
 }

@@ -1,13 +1,7 @@
 ﻿using Rainbow.Exceptions;
 using Rainbow.GarbageCollection.GCTypes;
 using Rainbow.Handlers;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
-using System.Net.Http.Headers;
-using System.Reflection;
-using System.Security.Permissions;
 using System.Text;
-using static System.Formats.Asn1.AsnWriter;
 
 // TODO: split this into multiple files
 namespace Rainbow.Execution {
@@ -137,6 +131,18 @@ namespace Rainbow.Execution {
             int index = 0;
 
             switch((byte)instr) {
+                case 0x04: {
+                    byte type1 = args[index++];
+                    byte[] bytes1 = GetBytes(args, type1, ref index);
+                    byte type2 = args[index++];
+                    byte[] bytes2 = GetBytes(args, type2, ref index);
+
+                    Instance? var = GetRef(GetSTR(args, ref index));
+                    if(var == null) {
+                        throw new NullRefException();
+                    }
+                    break;
+                }
                 case 0x2F: {
                     // TODO: actually get return value
                     return true;
@@ -157,6 +163,15 @@ namespace Rainbow.Execution {
                 case 0x3B: { // SYSCALL_I
                     byte type = args[index++];
                     HandleSyscall(type, args, ref index);
+                    break;
+                }
+                case 0x3C: {
+                    byte type = args[index++];
+                    string name = GetSTR(args, ref index);
+                    Block<byte> data = Globals.GarbageCollector.Alloc(GetTypeLength(type, args, index));
+                    data = Globals.GarbageCollector.stack.CopyTo(ref data);
+                    variables.Add(name, new Instance(name, (Type) type, data));
+                    Console.WriteLine(type.ToString("X2") + " " + name);
                     break;
                 }
                 default:
@@ -250,100 +265,126 @@ namespace Rainbow.Execution {
                 case 0x01:
                     GetRefLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x02:
                     GetRefLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x03:
                     GetTypeLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x04:
                     GetTypeLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x05:
+                    GetRefLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x06:
                     GetRefLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x07:
                     GetTypeLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x08:
                     GetTypeLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x09:
+                    GetRefLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x0A:
                     GetTypeLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x0B:
+                    GetRefLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x0C:
                     GetTypeLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x0D:
+                    GetRefLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x0E:
                     GetRefLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x0F:
                     GetTypeLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x10:
                     GetTypeLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x11:
+                    GetRefLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x12:
                     GetRefLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x13:
                     GetTypeLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x14:
                     GetTypeLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x15:
+                    GetRefLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x16:
                     GetRefLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x17:
                     GetTypeLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x18:
                     GetTypeLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x19:
+                    GetRefLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x1A:
                     GetTypeLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x1B:
                     GetRefLength(bytes, i, ref len, ref offset);
@@ -530,6 +571,15 @@ namespace Rainbow.Execution {
                     }
                     break;
                 }
+                case 0x3C: {
+                    byte type = bytes[i + offset];
+
+                    offset++;
+                    len++;
+
+                    GetRefLength(bytes, i, ref len, ref offset);
+                    break;
+                }
             }
 
             args = new byte[len];
@@ -565,6 +615,27 @@ namespace Rainbow.Execution {
                     offset += Types.lengths[type];
                     break;
             }
+        }
+
+        public int GetTypeLength(byte type, byte[] bytes, int i) {
+            int len = 0;
+
+            switch(type) {
+                case 0x0B:
+                    i++;
+                    while(bytes[i] != 0) {
+                        len++;
+                        i++;
+                    }
+                    break;
+                case 0x0C:
+                    break; // TODO(grimtin10): object specification
+                default:
+                    len += Types.lengths[type];
+                    break;
+            }
+
+            return len;
         }
 
         public byte GetRefLength(byte[] bytes, int i, ref byte len, ref int offset) {

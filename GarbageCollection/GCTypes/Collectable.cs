@@ -1,6 +1,3 @@
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-
 namespace Rainbow.GarbageCollection.GCTypes;
 
 public unsafe struct StackBlock
