@@ -32,7 +32,7 @@ public class AllocationEngine
             byte *ptr = (byte *)iptr.ToPointer();
 
             Block<byte> ret = new Block<byte>(ptr, size);
-            gc.totalCollected += size;
+            gc.totalCollected = gc.totalCollected + size;
             
             lock (queue) lock(queue.allocs) 
             {
