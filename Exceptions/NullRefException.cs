@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Rainbow.Exceptions {
+﻿namespace Rainbow.Exceptions {
     public class NullRefException : Exception {
         public NullRefException() : base() {
         }

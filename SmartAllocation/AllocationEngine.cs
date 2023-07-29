@@ -1,4 +1,3 @@
-using Rainbow.SmartAllocation.Types;
 using Rainbow.SmartAllocation.Experimental;
 using Rainbow.GarbageCollection;
 using Rainbow.GarbageCollection.GCTypes;

@@ -1,5 +1,4 @@
 using Rainbow.GarbageCollection.GCTypes;
-using System;
 using System.Runtime.InteropServices;
 
 namespace Rainbow.GarbageCollection;
