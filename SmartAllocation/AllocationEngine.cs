@@ -45,6 +45,15 @@ public class AllocationEngine
         return gc.Alloc(size);
     }
 
+    public Block<byte> AllocateAndFinalize(int size)
+    {
+        Block<byte> alloced = gc.Alloc(size);
+        Block<byte> ret = gc.stack.CopyTo(ref alloced);
+        gc.canCollect = true;
+
+        return ret;
+    }
+
     public void RunGarbageCollection()
     {
         Thread thread = new(new ThreadStart(GarbageCollectionThread));

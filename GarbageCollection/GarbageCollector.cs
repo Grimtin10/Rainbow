@@ -10,6 +10,7 @@ public unsafe class GarbageCollector
     public List<Block<byte>> refs { get; set; } = new();
     public int totalCollected = 0;
     public int collectionThreshold { get; set; }
+    public bool canCollect { get; set; }
 
     public GarbageCollector(int size = 4096 * 1024, int threshold = 1024)
     {
@@ -59,6 +60,8 @@ public unsafe class GarbageCollector
             this.Collect();
         }
 
+        canCollect = false;
+
         return mem;
     }
 
@@ -84,25 +87,28 @@ public unsafe class GarbageCollector
 
     public void Collect()
     {
-        List<Block<byte>> reachable = FindReachable();
-        List<int> freedAddrs = new();
-
-        //Console.WriteLine("lengths: " + reachable.Count + " " + refs.Count);
-
-        for(int i = 0; i < refs.Count; i++)
+        if(canCollect)
         {
-            //Console.WriteLine("ref: " + refs[i].ToString());
-            if(Contains(reachable, refs[i]))
-            {
-                Console.WriteLine("Not Freeing : " + (int)refs[i]._ref);
-            } else if(!freedAddrs.Contains((int)refs[i]._ref)) {
-                Console.WriteLine("Freeing : " + (int)refs[i]._ref);
-                freedAddrs.Add((int)refs[i]._ref);
-                ForceFree<byte>(refs[i]);
-            }
-        }
+            List<Block<byte>> reachable = FindReachable();
+            List<int> freedAddrs = new();
 
-        refs = refs.Where(x => reachable.Contains(x)).ToList();
+            //Console.WriteLine("lengths: " + reachable.Count + " " + refs.Count);
+
+            for(int i = 0; i < refs.Count; i++)
+            {
+                //Console.WriteLine("ref: " + refs[i].ToString());
+                if(Contains(reachable, refs[i]))
+                {
+                    Console.WriteLine("Not Freeing : " + (int)refs[i]._ref);
+                } else if(!freedAddrs.Contains((int)refs[i]._ref)) {
+                    Console.WriteLine("Freeing : " + (int)refs[i]._ref);
+                    freedAddrs.Add((int)refs[i]._ref);
+                    ForceFree<byte>(refs[i]);
+                }
+            }
+
+            refs = refs.Where(x => reachable.Contains(x)).ToList();
+        }
     }
 
     public List<Block<byte>> FindReachable()
