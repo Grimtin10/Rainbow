@@ -73,6 +73,14 @@ public unsafe class GarbageCollector
         return mem;
     }
 
+    public Block<byte> CustomConstruct(byte *addr, int size)
+    {
+        Block<byte> blk = new Block<byte>(addr, size);
+        refs.Add(blk);
+
+        return blk;
+    }
+
     public Block<T> AllocUntrackedGeneric<T>(int size) where T: unmanaged
     {
         IntPtr iptr = Marshal.AllocHGlobal(size);
@@ -210,6 +218,27 @@ public unsafe class GarbageCollector
         Collect();
 
         return new("All objects including newly allocated objects will be collected when forcing the GC to collect", WarningID.ForcedCollection);
+    }
+
+    /*
+        This function allowes users to construct
+        a GC reference out of an unmanaged pointer.
+        It helps users construct managed memory out
+        of unmanaged memory.
+
+        After calling this function the marshalled
+        block of memory will be sitting on the stack.
+    */
+    public Warning GCPointerMarshal(int addr, int size)
+    {
+        canCollect = false;
+        
+        Block<byte> blk = CustomConstruct((byte *)addr, size);
+        stack.CopyTo(ref blk);
+
+        canCollect = true;
+
+        return new("Unsafe memory conversions could cause segfaults", WarningID.UnsafeMarshal);
     }
 
     #endregion

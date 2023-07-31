@@ -14,5 +14,6 @@ public class Warning
 
 public enum WarningID
 {
-    ForcedCollection = 1
+    ForcedCollection = 1,
+    UnsafeMarshal = 2
 }
