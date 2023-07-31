@@ -1,7 +1,7 @@
 # Rainbow
 
 Rainbow is a bytecode runtime written in C# meant to give
-the user complete freedome over literally everything. The
+the user complete freedom over literally everything. The
 goal is to acheive complete freedome while still promoting
 safe written code, and while also providing the tools to
 do so.  
@@ -61,3 +61,7 @@ Here are our future plans for Rainbow:
 - [ ] Improve the runtime and add features
 - [ ] Experiment with garbage collection and make ours better
 - [ ] Make program self collection (I don't know if this is possible but I want to try it - YendisFish)
+
+# Contributor Pages
+[YendisFish](https://github.com/YendisFish)  
+[Grimtin10](https://github.com/Grimtin10)
