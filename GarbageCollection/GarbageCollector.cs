@@ -1,4 +1,5 @@
 using Rainbow.GarbageCollection.GCTypes;
+using Rainbow.Types;
 using System.Runtime.InteropServices;
 
 namespace Rainbow.GarbageCollection;
@@ -194,4 +195,22 @@ public unsafe class GarbageCollector
             stack.Push(ref ptr);
         }
     }
+
+    #region Runtime Allowed Funcs
+
+    /*
+        this function can and will collect
+        ALL variables that have not been
+        pushed onto the stack. Even if
+        they have just been allocated
+    */
+    public Warning GCCollect() //known as "collect" in the bytecode
+    {
+        canCollect = true;
+        Collect();
+
+        return new("All objects including newly allocated objects will be collected when forcing the GC to collect", WarningID.ForcedCollection);
+    }
+
+    #endregion
 }

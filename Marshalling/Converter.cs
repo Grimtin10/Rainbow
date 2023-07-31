@@ -2,7 +2,7 @@ using System.Text;
 
 namespace Rainbow.Marshalling;
 
-public static class Marshalling
+public static class Converter
 {
     public static byte ToUInt8(byte[] arr) {
         return arr[0];

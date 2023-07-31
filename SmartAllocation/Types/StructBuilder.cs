@@ -1,11 +1,12 @@
 using Rainbow.GarbageCollection;
 using Rainbow.GarbageCollection.GCTypes;
+using Rainbow.Types;
 
 namespace Rainbow.SmartAllocation.Types;
 
 public class StructBuilder
 {
-    public StructInfo info { get; set; } = StructInfo.Empty;
+    public StructInfo info { get; set; } = new();
     public AllocationEngine engine { get; set; }
 
     public StructBuilder(ref AllocationEngine eng, StructInfo info)
@@ -14,32 +15,48 @@ public class StructBuilder
         this.info = info;
     }
 
-    /*
-    public Block<byte> Allocate()
+    public int CalculateSize() // TODO
     {
-        int totalsize = 0;
-        for(int i = 0; i < info.variableInfo.Count; i++)
+        int ret = 0;
+        foreach(KeyValuePair<string, VariableInfo> inf in info.variableInfo)
         {
-            totalsize = totalsize + info.variableInfo[i].size;
+            ret = ret + inf.Value.size;
         }
 
-        Block<byte> reference = engine.AllocSimple(totalsize);
-        int blockpos = 0;
-    }*/
+        return ret;
+    }
 
-    public void WriteType() { }
+    public unsafe Struct WriteStruct(Block<byte> mymem)
+    {
+        Struct s = new();
+        s.ptr = mymem;
+
+        int pos = 0;
+        foreach(KeyValuePair<string, VariableInfo> inf in info.variableInfo)
+        {
+            byte *start = (byte *)((long)mymem._ref + pos);
+            Block<byte> blk = new Block<byte>(start, inf.Value.size);
+
+            s.accessor.Add(inf.Key, new KeyValuePair<Type, Block<byte>>(inf.Value.type, blk));
+        }
+
+        return s;
+    }
 }
 
 public class StructInfo
 {
-    public List<VariableInfo> variableInfo { get; set; } = new();
+    public Dictionary<string, VariableInfo> variableInfo { get; set; } = new();
 
-    public StructInfo(List<VariableInfo> info)
+    public StructInfo()
     {
-        this.variableInfo = info;
+        this.variableInfo = new();
     }
 
-    public static StructInfo Empty => new StructInfo(new());
+    public void Add(string propertyName, VariableInfo inf)
+    {
+        variableInfo.Add(propertyName, inf);
+    }
 }
 
 public class VariableInfo
