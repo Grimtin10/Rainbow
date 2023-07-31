@@ -1,5 +1,5 @@
 # Rainbow
----
+
 Rainbow is a bytecode runtime written in C# meant to give  
 the user complete freedome over literally everything. The  
 goal is to acheive complete freedome while still promoting  
@@ -7,7 +7,7 @@ safe written code, and while also providing the tools to
 do so.  
 
 # What is the ideology of the runtime?
----
+
 As stated before Rainbows main focus is on providing complete  
 freedom to the user while still promoting well written code. So  
 how do we do it?
@@ -37,7 +37,7 @@ support and provide ways to compile/transpile to native machine
 code, LLVM, CIL, and possibly more alternative binary formats.
 
 # Extended Garbage Collection
----
+
 Rainbows garbage collector is highly dynamic and manageable compared  
 to just about any other languages garbage collector. It allows many  
 different allocation methods and reference management methods. It even  
@@ -51,7 +51,7 @@ can even construct a managed pointer from an address! Meaning you can easily
 convert from unsafe code to safe code!
 
 # Future TODOS
----
+
 Here are our future plans for Rainbow:
 
 - [ ] Add support for compilation to assembly and LLVM
