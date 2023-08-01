@@ -30,6 +30,9 @@ public unsafe class GarbageCollector
 
     public void FreeRootStack()
     {
+        canCollect = true;
+        Collect();
+
         Console.WriteLine("Freeing root stack.");
         foreach(Block<byte> r in refs)
         {

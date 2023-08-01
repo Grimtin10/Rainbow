@@ -24,6 +24,6 @@ class Program {
 
     public unsafe static void Nightly()
     {
-
+        
     }
 }
