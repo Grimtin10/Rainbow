@@ -15,7 +15,7 @@ public class StructBuilder
         this.info = info;
     }
 
-    public int CalculateSize() // TODO
+    public int CalculateSize()
     {
         int ret = 0;
         foreach(KeyValuePair<string, VariableInfo> inf in info.variableInfo)
@@ -38,6 +38,7 @@ public class StructBuilder
             Block<byte> blk = new Block<byte>(start, inf.Value.size);
 
             s.accessor.Add(inf.Key, new KeyValuePair<Type, Block<byte>>(inf.Value.type, blk));
+            pos = pos + inf.Value.size;
         }
 
         return s;

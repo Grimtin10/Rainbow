@@ -181,7 +181,7 @@ public unsafe class GarbageCollector
         return ret;
     }
 
-    private bool Contains(List<Block<byte>> blocks, Block<byte> block) {
+    public bool Contains(List<Block<byte>> blocks, Block<byte> block) {
         foreach(Block<byte> b in blocks) {
             //Console.WriteLine("b: " + b.ToString());
             if(block.Equals(b)) return true;

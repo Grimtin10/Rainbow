@@ -2,6 +2,8 @@
 using Rainbow.GarbageCollection;
 using Rainbow.GarbageCollection.GCTypes;
 using Rainbow.SmartAllocation;
+using Rainbow.Types;
+using Rainbow.SmartAllocation.Types;
 
 namespace Rainbow;
 
@@ -22,28 +24,22 @@ class Program {
     public unsafe static void Nightly()
     {
         System.Diagnostics.Stopwatch watch = new();
+
         GarbageCollector gc = new();
+        AllocationEngine eng = new(ref gc);
 
-        for(int i = 0; i < 10; i++)
-        {
-            Block<byte> b = gc.Alloc(2048);
-        }
+        ClassInfo inf = new();
+        inf.Add("prop1", new VariableInfo(typeof(int), false, sizeof(int)));
+        inf.Add("prop2", new VariableInfo(typeof(byte), false, sizeof(byte) * 7));
 
-        Block<byte> ptr = gc.Alloc(40);
-        gc.stack.CopyTo(ref ptr);
-        //gc.stack.CopyTo(ref b);
+        ClassBuilder bldr = new(ref eng, inf);
+        Class s = bldr.WriteClass();
 
-        gc.canCollect = true;
+        s.accessor["prop1"].Value.MarshalBlock<int>().SetPos(0, 5);
+        s.accessor["prop2"].Value.MarshalBlock<int>().SetPos(0, 0xFF);
 
-        watch.Start();
-        gc.Collect();
-        watch.Stop();
-
-        Console.WriteLine("Elapsed Time: " + watch.Elapsed.TotalMilliseconds);
-
-        gc.stack.Pop();
-        gc.Collect();
-        
-        //Block<byte> x = gc.Alloc(1023);
+        Console.WriteLine(s.accessor["prop1"].Value.MarshalBlock<int>()[0]);
+        Console.WriteLine(s.accessor["prop2"].Value.MarshalBlock<int>()[0]);
+        //s.accessor["prop1"].Value.MarshalBlock<int>().SetPos(1, 5);
     }
 }
