@@ -3,6 +3,10 @@
     "Rainbow": {
       "commandName": "Project",
       "commandLineArgs": "C:\\Users\\Grim\\source\\repos\\Rainbow\\Rainbow\\Examples/Add2/add2.rbb"
+    },
+    "RainbowNightly": {
+      "commandName": "Project",
+      "commandLineArgs": "nightly"
     }
   }
 }

@@ -14,33 +14,25 @@ public unsafe class ClassBuilder
         this.inf = inf;
     }
 
-    public int CalculateSize()
-    {
-        return inf.variableInfo.Count;
-    }
-
     public Class WriteClass()
     {
-        Block<Block<byte>> mem = eng.gc.stack.StackAlloc<Block<byte>>(true, CalculateSize());
-        Class ret = new Class();
-
+        Block<Block<byte>> ptrs = eng.gc.stack.StackAlloc<Block<byte>>(true, inf.variableInfo.Count);
+        Class ret = new();
+        
         int pos = 0;
-        foreach(KeyValuePair<string, VariableInfo> var in inf.variableInfo)
+        foreach(KeyValuePair<string, VariableInfo> i in inf.variableInfo)
         {
-            Block<byte> ptr = new Block<byte>((byte *)((int)mem._ref) + (pos * sizeof(Block<byte>)), sizeof(Block<byte>));
-            ret.accessor.Add(var.Key, new(var.Value.type, ptr));
-
-            Block<byte> b = eng.AllocateAndFinalize(var.Value.size);
-            b.isref = true;
-
-            mem.SetPos(pos, b);
-
-            //ret.accessor.Add(var.Key, new(var.Value.type, ptr));
+            Block<byte> varptr = eng.AllocSimple(i.Value.size);
+            ptrs.SetPos(pos, varptr);
 
             pos = pos + 1;
+
+            ret.accessor.Add(i.Key, new(i.Value.type, varptr));
         }
 
-        ret.ptr = mem.GetBlockBytes();
+        eng.gc.canCollect = true;
+
+        ret.ptr = ptrs.GetBlockBytes();
 
         return ret;
     }

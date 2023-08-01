@@ -13,7 +13,7 @@ public unsafe struct Block<T> : IDisposable where T : unmanaged
     {
         get {
             if(index >= length) {
-                throw new Exception("Unable to read memory!");
+                throw new AccessViolationException("Unable to read memory!");
             } else {
                 return _ref[index];
             }
@@ -29,7 +29,7 @@ public unsafe struct Block<T> : IDisposable where T : unmanaged
     public void SetPos(int index, T value) {
         if(index >= length) {
             Console.WriteLine(index);
-            throw new Exception("Unable to write memory!");
+            throw new AccessViolationException("Unable to write memory!");
         } else {
             _ref[index] = value;
         }
@@ -50,7 +50,8 @@ public unsafe struct Block<T> : IDisposable where T : unmanaged
         return false;
     }
 
-    public override string ToString() { 
+    public override string ToString() 
+    {
         return (int) _ref + " " + length;
     }
 }
@@ -59,15 +60,19 @@ public unsafe static class BlockExtensions {
     public static string ReadString(this Block<char> blk)
     {
         StringBuilder bld = new();
-        for(int i = 0; i < blk.length; i++) {
+        
+        for(int i = 0; i < blk.length; i++) 
+        {
             bld.Append(blk[i]);
         }
 
         return bld.ToString();
     }
 
-    public static void FillBytes(this Block<byte> blk, byte[] bytes) {
-        for(int i = 0; i < bytes.Length; i++) {
+    public static void FillBytes(this Block<byte> blk, byte[] bytes) 
+    {
+        for(int i = 0; i < bytes.Length; i++) 
+        {
             blk.SetPos(i, bytes[i]);
         }
     }
@@ -88,16 +93,22 @@ public unsafe static class BlockExtensions {
         return new Block<byte>((byte *)blk._ref, blk.length * sizeof(T));
     }
 
-    public static byte[] GetBytes(this Block<byte> blk) {
+    public static byte[] GetBytes(this Block<byte> blk) 
+    {
         byte[] bytes = new byte[blk.length];
-        for(int i = 0; i < blk.length; i++) {
+        
+        for(int i = 0; i < blk.length; i++) 
+        {
             bytes[i] = blk[i];
         }
+        
         return bytes;
     }
 
-    public static string ReadString(this Block<byte> blk) {
+    public static string ReadString(this Block<byte> blk) 
+    {
         StringBuilder bld = new();
+        
         for(int i = 0; i < blk.length; i++) {
             bld.Append((char) blk[i]);
         }
