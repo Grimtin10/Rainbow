@@ -49,7 +49,7 @@ public unsafe struct StackBlock
         return bt;
     }
 
-    public Block<T> StackAlloc<T>(bool blockIsRef, int size = 1, bool isref = false) where T: unmanaged
+    public Block<T> StackAlloc<T>(bool blockIsRef, int size = 1) where T: unmanaged
     {
         byte *start = (byte *)((long)mem._ref + pos);
 
