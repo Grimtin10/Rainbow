@@ -3,6 +3,8 @@ using System.Runtime.InteropServices;
 
 namespace Rainbow.Marshalling;
 
+#region These are all runtime allowed funcs!
+
 public unsafe static class Unsafe
 {
     public static Block<byte> UnsafeAlloc(int size = 1)
@@ -32,3 +34,5 @@ public unsafe static class Unsafe
         return ret;
     }
 }
+
+#endregion

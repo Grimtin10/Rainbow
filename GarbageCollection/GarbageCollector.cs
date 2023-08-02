@@ -265,5 +265,29 @@ public unsafe class GarbageCollector
         return new("Unsafe memory conversions could cause segfaults", WarningID.UnsafeMarshal);
     }
 
+    /*
+        This function allows the user to force the Garbage
+        Collector to free a pointer. Even if it hasn't triggered
+        a collection yet! This can lead to segfaults!
+    */
+    public Warning GCFree(Block<byte> block)
+    {
+        refs.Remove(block);
+        ForceFree<byte>(block);
+
+        return new Warning("Force freeing of memory without proper management can cause segfaults!", WarningID.ForcedCollection);
+    }
+
+    /*
+        This code forces the GC to allocate a tracked pointer and return it
+    */
+    public Block<byte> GCAlloc(int size)
+    {
+        Block<byte> ret = Alloc(size);
+        canCollect = true;
+
+        return ret;
+    }
+
     #endregion
 }
