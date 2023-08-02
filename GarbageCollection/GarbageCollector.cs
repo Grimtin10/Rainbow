@@ -11,6 +11,7 @@ public unsafe class GarbageCollector
     public int totalCollected = 0;
     public int collectionThreshold { get; set; }
     public bool canCollect { get; set; }
+    public int popCount = 0;
 
     public GarbageCollector(int size = 4096 * 1024, int threshold = 1024)
     {
@@ -68,7 +69,13 @@ public unsafe class GarbageCollector
         
         if(totalCollected >= collectionThreshold && alloccollect)
         {
-            this.Collect();
+            Collect();
+        }
+
+        if(popCount == 5)
+        {
+            Collect();
+            popCount = 0;
         }
 
         canCollect = false;
@@ -213,6 +220,12 @@ public unsafe class GarbageCollector
         {
             stack.Push(ref ptr);
         }
+    }
+
+    public void PopStack()
+    {
+        stack.Pop();
+        popCount = popCount + 1;
     }
 
     #region Runtime Allowed Funcs

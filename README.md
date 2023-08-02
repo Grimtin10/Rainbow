@@ -21,7 +21,7 @@ collector that is highly dynamic and friendly to manual control.
 Meaning that the garbage collector *can* run on its own but can
 also completely be controlled and managed. See [Extended Garbage Collection](#extended-garbage-collection)
 
-### Object Oriented and Functional Programming
+### Object Oriented and Procedural Programming
 Rainbow supports both functional and object-oriented
 schemas. Since it all comes down to bytes in the end why does it matter
 right? Rainbow provides ways to manipulate pointers and

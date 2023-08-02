@@ -35,8 +35,22 @@ class Program {
         
         Class c = bldr.WriteClass();
 
-        gc.stack.Pop();
+        gc.PopStack();
 
-        gc.Collect();
+        Block<byte> x = eng.AllocateAndFinalize(2);
+        Block<byte> y = eng.AllocateAndFinalize(2);
+
+        gc.PopStack();
+        gc.PopStack();
+
+        Block<byte> z = eng.AllocateAndFinalize(2);
+        Block<byte> a = eng.AllocateAndFinalize(2);
+        Block<byte> b = eng.AllocateAndFinalize(2);
+
+        gc.PopStack();
+        gc.PopStack();
+
+        Console.WriteLine("trying to make GC collect");
+        Block<byte> d = eng.AllocateAndFinalize(2);
     }
 }

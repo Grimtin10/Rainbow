@@ -1,0 +1,32 @@
+incorporates system;
+
+int main()
+{
+    List<int> *ptr = CreateList<int>(5);
+    AddList(ptr, 1);
+    AddList(ptr, 2);
+    AddList(ptr, 3);
+    AddList(ptr, 4);
+    AddList(ptr, 5);
+}
+
+struct List<T>
+{
+    T *ptr;
+    int length;
+}
+
+List<T> * CreateList<T>(int length)
+{
+    List<T> *ret = alloc(sizoef(List<T>));
+    ret->ptr = alloc(sizeof(T) * length);
+    ret->length = length;
+
+    return ret;
+}
+
+void AddList<T>(List<T> *ptr, T val)
+{
+    ptr->ptr = alloc(ptr->length + 1);
+    ptr->ptr[ptr->length - 1] = val;
+}
