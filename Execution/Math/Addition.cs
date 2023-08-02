@@ -11,43 +11,15 @@ namespace Rainbow.Execution.Math {
         // TODO FIXME PLEASE HELP GOD: theres gotta be a better way
         public static void AddUInt8(byte val1, byte type2, byte[] val2, ref Instance _var) {
             switch((Type) type2) {
-                case Type.uint8: {
-                    byte v = conv.ToUInt8(val2);
-                    Move.SetUInt8((byte) (val1 + v), ref _var);
-                    break;
-                }
-                case Type.uint16: {
-                    ushort v = conv.ToUInt16(val2);
-                    Move.SetUInt8((byte) (val1 + v), ref _var);
-                    break;
-                }
-                case Type.uint32: {
-                    uint v = conv.ToUInt32(val2);
-                    Move.SetUInt8((byte) (val1 + v), ref _var);
-                    break;
-                }
-                case Type.uint64: {
-                    ulong v = conv.ToUInt64(val2);
-                    Move.SetUInt8((byte) (val1 + v), ref _var);
-                    break;
-                }
-                case Type.int8: {
-                    sbyte v = conv.ToInt8(val2);
-                    Move.SetUInt8((byte) (val1 + v), ref _var);
-                    break;
-                }
-                case Type.int16: {
-                    short v = conv.ToInt16(val2);
-                    Move.SetUInt8((byte) (val1 + v), ref _var);
-                    break;
-                }
-                case Type.int32: {
-                    int v = conv.ToInt32(val2);
-                    Move.SetUInt8((byte) (val1 + v), ref _var);
-                    break;
-                }
+                case Type.uint8:
+                case Type.uint16:
+                case Type.uint32:
+                case Type.uint64:
+                case Type.int8:
+                case Type.int16:
+                case Type.int32:
                 case Type.int64: {
-                    long v = conv.ToInt64(val2);
+                    byte v = conv.ToUInt8(val2);
                     Move.SetUInt8((byte) (val1 + v), ref _var);
                     break;
                 }

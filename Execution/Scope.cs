@@ -33,7 +33,7 @@ namespace Rainbow.Execution {
             List<byte> scopeBytes = new();
 
             for(int i = 0; i < bytes.Length; i++) {
-                if(bytes[i] == 0xFF) {
+                if(bytes[i] == 0xFF && scopeDepth == 0) {
                     inFunction = true;
                     funcName = "";
                     funcType = Type.undefined;
@@ -145,6 +145,20 @@ namespace Rainbow.Execution {
                     }
 
                     Arithmetic.Add(type1, bytes1, type2, bytes2, ref var);
+                    break;
+                }
+                case 0x08: {
+                    byte type1 = args[index++];
+                    byte[] bytes1 = GetBytes(args, type1, ref index);
+                    byte type2 = args[index++];
+                    byte[] bytes2 = GetBytes(args, type2, ref index);
+
+                    Instance? var = GetRef(GetSTR(args, ref index));
+                    if(var == null) {
+                        throw new NullRefException();
+                    }
+
+                    Arithmetic.Sub(type1, bytes1, type2, bytes2, ref var);
                     break;
                 }
                 case 0x2F: {
@@ -631,6 +645,8 @@ namespace Rainbow.Execution {
                 }
             }
 
+            Console.WriteLine(i + " " + instr + " " + len);
+
             args = new byte[len];
 
             for(int j = 0; j < args.Length; j++, i++) {
@@ -642,6 +658,7 @@ namespace Rainbow.Execution {
 
         public void GetTypeLength(byte[] bytes, int i, ref byte len, ref int offset) {
             i += offset;
+            Console.Write("i: " + i + " ");
             byte type = bytes[i++];
 
             len++;
@@ -662,6 +679,7 @@ namespace Rainbow.Execution {
                 default:
                     len += Types.lengths[type];
                     offset += Types.lengths[type];
+                    Console.WriteLine("type: " + type + " len: " + Types.lengths[type]);
                     break;
             }
         }
@@ -689,10 +707,12 @@ namespace Rainbow.Execution {
 
         public byte GetRefLength(byte[] bytes, int i, ref byte len, ref int offset) {
             i += offset;
+            Console.Write("i: " + i + " " + bytes[i] + " ");
             byte length = bytes[i];
             len += length;
             len++;
             offset += length + 1;
+            Console.WriteLine("r: " + length);
 
             return length;
         }
