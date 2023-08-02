@@ -22,11 +22,12 @@ Meaning that the garbage collector *can* run on its own but can
 also completely be controlled and managed. See [Extended Garbage Collection](#extended-garbage-collection)
 
 ### Object Oriented and Procedural Programming
-Rainbow supports both functional and object-oriented
+Rainbow supports both procedural and object-oriented
 schemas. Since it all comes down to bytes in the end why does it matter
 right? Rainbow provides ways to manipulate pointers and
-references while also keeping management over them. We call
-them safe pointers!
+references while also keeping management over them. This allows
+you to manage objects and values from either a procedural standpoint
+or a OOP standpoint
 
 ### Runtime Allowed Internal Functions
 While there are still some internal runtime functions
