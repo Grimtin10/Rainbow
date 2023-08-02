@@ -24,33 +24,6 @@ class Program {
 
     public unsafe static void Nightly()
     {
-        GarbageCollector gc = new();
-        AllocationEngine eng = new(ref gc);
 
-        ClassInfo personInfo = new();
-        personInfo.Add("age", new VariableInfo(typeof(int), false, sizeof(int)));
-        personInfo.Add("first", new VariableInfo(typeof(char), false, sizeof(char)));
-
-        ClassBuilder bldr = new ClassBuilder(ref eng, personInfo);
-        
-        Class c = bldr.WriteClass();
-
-        gc.PopStack();
-
-        Block<byte> x = eng.AllocateAndFinalize(2);
-        Block<byte> y = eng.AllocateAndFinalize(2);
-
-        gc.PopStack();
-        gc.PopStack();
-
-        Block<byte> z = eng.AllocateAndFinalize(2);
-        Block<byte> a = eng.AllocateAndFinalize(2);
-        Block<byte> b = eng.AllocateAndFinalize(2);
-
-        gc.PopStack();
-        gc.PopStack();
-
-        Console.WriteLine("trying to make GC collect");
-        Block<byte> d = eng.AllocateAndFinalize(2);
     }
 }

@@ -16,7 +16,7 @@ public unsafe struct StackBlock
 
     public Block<byte> Push(ref Block<byte> ptr)
     { 
-        Block<byte> bt = StackAlloc<byte>(ptr.isref, ptr.length, false);
+        Block<byte> bt = StackAlloc<byte>(ptr.isref, ptr.length);
 
         for(int i = 0; i < bt.length; i++)
         {
@@ -32,7 +32,7 @@ public unsafe struct StackBlock
 
     public Block<byte> PushRef(ref Block<byte> ptr)
     { 
-        Block<byte> bt = StackAlloc<byte>(ptr.isref, ptr.length, true);
+        Block<byte> bt = StackAlloc<byte>(ptr.isref, ptr.length);
 
         for(int i = 0; i < bt.length; i++)
         {
@@ -62,8 +62,8 @@ public unsafe struct StackBlock
         pos = pos + (size * sizeof(T));
         obj.isref = blockIsRef;
 
-        Console.WriteLine("Allocated on stack: " + obj.ToString());
-        ptrs.Add(new(isref, obj));
+        //Console.WriteLine("Allocated on stack: " + obj.ToString());
+        ptrs.Add(new(blockIsRef, obj));
 
         return obj.MarshalBlock<T>();
     }

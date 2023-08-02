@@ -127,9 +127,9 @@ public unsafe class GarbageCollector
                 if(Contains(reachable, refs[i]))
                 {
                     newrefs.Add(refs[i]);
-                    Console.WriteLine("Not Freeing : " + (int)refs[i]._ref);
+                    //Console.WriteLine("Not Freeing : " + (int)refs[i]._ref);
                 } else if(!freedAddrs.Contains((int)refs[i]._ref)) {
-                    Console.WriteLine("Freeing : " + (int)refs[i]._ref);
+                    //Console.WriteLine("Freeing : " + (int)refs[i]._ref);
                     freedAddrs.Add((int)refs[i]._ref);
                     ForceFree<byte>(refs[i]!);
                 }
