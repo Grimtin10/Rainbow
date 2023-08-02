@@ -24,6 +24,19 @@ class Program {
 
     public unsafe static void Nightly()
     {
+        GarbageCollector gc = new();
+        AllocationEngine eng = new(ref gc);
+
+        ClassInfo personInfo = new();
+        personInfo.Add("age", new VariableInfo(typeof(int), false, sizeof(int)));
+        personInfo.Add("first", new VariableInfo(typeof(char), false, sizeof(char)));
+
+        ClassBuilder bldr = new ClassBuilder(ref eng, personInfo);
         
+        Class c = bldr.WriteClass();
+
+        gc.stack.Pop();
+
+        gc.Collect();
     }
 }

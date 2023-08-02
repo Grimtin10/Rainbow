@@ -8,6 +8,7 @@ public unsafe struct Block<T> : IDisposable where T : unmanaged
     public T* _ref { get; set; }
     public int length { get; set; }
     public bool isref { get; set; } = false;
+    public bool isCollection { get; set; } = false;
 
     public T this[int index] 
     {

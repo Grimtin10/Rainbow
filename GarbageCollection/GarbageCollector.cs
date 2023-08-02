@@ -174,6 +174,14 @@ public unsafe class GarbageCollector
 
             Block<Block<byte>> ptrtptr = collectable.MarshalBlock<Block<byte>>();
             ret.AddRange(SearchCollectable(ptrtptr[0]));
+        } else if(collectable.isCollection)
+        {
+            Block<Block<byte>> ptrtptr = collectable.MarshalBlock<Block<byte>>();
+
+            for(int i = 0; i < ptrtptr.length; i++)
+            {
+                ret.AddRange(SearchCollectable(ptrtptr[i]));
+            }
         } else {
             //Console.WriteLine("wasnt ref");
             ret.Add(collectable);
