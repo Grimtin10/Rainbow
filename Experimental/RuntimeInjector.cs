@@ -1,23 +1,14 @@
+using System.Reflection;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis;
-using System.Reflection;
 using System.Text;
 
 namespace Rainbow.Experimental;
 
-public class CSExecutionEngine
+public static class RuntimeInjector
 {
-    public string nspace { get; set; }
-    public string[] imports { get; set; }
-
-    public CSExecutionEngine()
-    {
-        nspace = "";
-        imports = new string[0];
-    }
-
-    public void ExecuteVoid(string code, CSExecutionInfo info)
+    public static void InjectPartial(string code)
     {
         SyntaxTree ast = CSharpSyntaxTree.ParseText(code, new CSharpParseOptions(LanguageVersion.CSharp9));
         
@@ -51,11 +42,6 @@ public class CSExecutionEngine
             {
                 stream.Seek(0, SeekOrigin.Begin);
                 Assembly assembly = AppDomain.CurrentDomain.Load(stream.ToArray());
-                
-                Type tp = assembly.GetType(info.methodPath) ?? typeof(void);
-                object obj = Activator.CreateInstance(tp) ?? 0;
-
-                tp.InvokeMember(info.methodName, BindingFlags.Default | BindingFlags.InvokeMethod, null, obj, info.args);
             } else {
                 Console.WriteLine("Failed!");
 
@@ -70,19 +56,3 @@ public class CSExecutionEngine
         }
     }
 }
-
-public static class CSExecutionInjector
-{
-    public static void InjectImport(string import, ref CSExecutionEngine eng)
-    {
-        eng.imports = new string[eng.imports.Length + 1];
-        eng.imports[eng.imports.Length - 1] = import;
-    }
-
-    public static void InjectNamespace(string nspace, ref CSExecutionEngine eng)
-    {
-        eng.nspace = nspace;
-    }
-}
-
-public record CSExecutionInfo(string methodPath, string methodName, params object[]? args);

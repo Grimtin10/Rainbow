@@ -27,6 +27,14 @@ public unsafe struct Block<T> : IDisposable where T : unmanaged
         this.length = len;
     }
 
+    public IEnumerator<T> GetEnumerator()
+    {
+        for(int i = 0; i < length; i++)
+        {
+            yield return this[i];
+        }
+    }
+
     public void SetPos(int index, T value) {
         if(index >= length) {
             Console.WriteLine(index);

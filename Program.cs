@@ -5,6 +5,9 @@ using Rainbow.SmartAllocation;
 using Rainbow.Types;
 using Rainbow.SmartAllocation.Types;
 using Rainbow.Marshalling;
+using Rainbow.Experimental;
+using System.Reflection;
+using Rainbow.Handlers;
 
 namespace Rainbow;
 
@@ -24,6 +27,31 @@ class Program {
 
     public unsafe static void Nightly()
     {
+        string code = @"
+            using System;
+            using System.IO;
+            using System.Collections.Generic;
+            
+            namespace Rainbow.GarbageCollection
+            {
+                public static class GCExtensions
+                {
+                    public static void Clear(this GarbageCollector gc)
+                    {
+                        gc.refs = new();
+                    }
+                }
+            }
+        ";
 
+        RuntimeInjector.InjectPartial(code);
+
+        typeof(GarbageCollector).InvokeMember(
+            "Clear",
+            BindingFlags.Default | BindingFlags.InvokeMethod,
+            null,
+            Globals.GarbageCollector,
+            null
+        );
     }
 }
