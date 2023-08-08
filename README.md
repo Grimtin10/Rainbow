@@ -27,7 +27,7 @@ schemas. Since it all comes down to bytes in the end why does it matter
 right? Rainbow provides ways to manipulate pointers and
 references while also keeping management over them. This allows
 you to manage objects and values from either a procedural standpoint
-or a OOP standpoint
+or an OOP standpoint
 
 ### Runtime Allowed Internal Functions
 While there are still some internal runtime functions
