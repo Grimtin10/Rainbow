@@ -1,0 +1,22 @@
+incorporates system;
+incorporates system.generics; //compiler filled class
+
+/*
+    generic structs/classes work differently in the sense that
+    they have to be an instance before you do anything
+    with them. They cannot be null!!!! there must be some
+    value or empty value inside of them!
+*/
+
+generic struct InfiniteTuple<params generics[]>
+{
+    typeof(generics[index]) ReadValue(int index)
+    {
+        return generics[index];
+    }
+
+    void SetValue(int index, typeof(generics[index]) value)
+    {
+        generics[index] = value;
+    }
+}
