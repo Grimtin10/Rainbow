@@ -212,7 +212,7 @@ public unsafe class GarbageCollector
         if(isref)
         {
             refs = refs.Where(x => !x.Equals(ptr)).ToList();
-            stack.PushRef(ref ptr);
+            stack.CopyTo(ref ptr);
 
             //Console.WriteLine("Freeing :: " + (int)ptr._ref + " Realloced to: " + (int)stack.ptrs[stack.ptrs.Count - 1].Value._ref);
             ForceFree<byte>(ptr);
@@ -226,6 +226,12 @@ public unsafe class GarbageCollector
     {
         stack.Pop();
         popCount = popCount + 1;
+    }
+
+    public void AttachReference(Block<byte> ptr)
+    {
+        stack.CopyTo(ref ptr);
+        refs.Add(ptr);
     }
 
     #region Runtime Allowed Funcs
