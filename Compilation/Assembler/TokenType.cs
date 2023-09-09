@@ -12,5 +12,7 @@ namespace Rainbow.Compilation.Assembler {
         VALUE,
         LBRACKET,
         RBRACKET,
+        LPAREN,
+        RPAREN,
     }
 }

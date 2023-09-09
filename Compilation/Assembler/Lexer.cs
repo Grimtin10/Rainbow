@@ -1,12 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Rainbow.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Rainbow.Compilation.Assembler {
+﻿namespace Rainbow.Compilation.Assembler {
     internal class Lexer {
         public static List<Token> Lex(string[] input) {
             List<Token> tokens = new List<Token>();
@@ -18,20 +10,30 @@ namespace Rainbow.Compilation.Assembler {
                 for(int j = 0; j < line.Length; j++) {
                     switch(line[j]) {
                         case ' ':
-                        case '(':
-                        case ')':
                         case ',':
                             if(curString.Trim().Length > 0) {
-                                Console.WriteLine(TokenizeString(curString.Trim()));
+                                tokens.Add(TokenizeString(curString.Trim()));
                                 curString = "";
                             }
                             break;
                         case '*':
                             if(curString.Trim().Length > 0) {
-                                Console.WriteLine(TokenizeString(curString.Trim()));
+                                tokens.Add(TokenizeString(curString.Trim()));
                                 curString = "*";
 
-                                Console.WriteLine(TokenizeString(curString.Trim()));
+                                tokens.Add(TokenizeString(curString.Trim()));
+                                curString = "";
+                            }
+                            break;
+                        case '(':
+                        case ')':
+                            if(curString.Trim().Length > 0) {
+                                tokens.Add(TokenizeString(curString.Trim()));
+
+                                curString = "" + line[j];
+
+                                tokens.Add(TokenizeString(curString.Trim()));
+
                                 curString = "";
                             }
                             break;
@@ -42,8 +44,7 @@ namespace Rainbow.Compilation.Assembler {
                 }
 
                 if(curString.Trim().Length > 0) {
-                    Console.WriteLine(TokenizeString(curString.Trim()));
-                    curString = "";
+                    tokens.Add(TokenizeString(curString.Trim()));
                 }
             }
 
@@ -61,6 +62,10 @@ namespace Rainbow.Compilation.Assembler {
                 return new Token(TokenType.LBRACKET, input);
             } else if(input.Equals("}")) {
                 return new Token(TokenType.RBRACKET, input);
+            } else if(input.Equals("(")) {
+                return new Token(TokenType.LPAREN, input);
+            } else if(input.Equals(")")) {
+                return new Token(TokenType.RPAREN, input);
             } else { // if you dont know what it is, it might be a string
                 return new Token(TokenType.STR, input);
             }
