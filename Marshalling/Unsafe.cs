@@ -15,6 +15,11 @@ public unsafe static class Unsafe
         return new Block<byte>(ptr, size);
     }
 
+    public static Block<T> UnsafeGenericAlloc<T>(int size) where T: unmanaged
+    {
+        return new Block<T>((T *)Marshal.AllocHGlobal(sizeof(T) * size), size);
+    }
+
     public static void Free<T>(T *ptr) where T: unmanaged
     {
         Marshal.FreeHGlobal(new(ptr));

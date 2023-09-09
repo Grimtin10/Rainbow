@@ -91,12 +91,16 @@ public unsafe class GarbageCollector
         return blk;
     }
 
+    /*
+        Deprecated
+    */
     public Block<T> AllocUntrackedGeneric<T>(int size) where T: unmanaged
     {
         IntPtr iptr = Marshal.AllocHGlobal(size);
         T *ptr = (T *)iptr.ToPointer();
 
         Block<T> mem = new Block<T>(ptr, size);
+        
         return mem;
     }
 

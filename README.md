@@ -70,3 +70,7 @@ Here are our plans for Rainbow:
 # Contributor Pages
 [YendisFish](https://github.com/YendisFish)  
 [Grimtin10](https://github.com/Grimtin10)
+
+### Developer Quote
+
+Rainbow: does what it shouldn't!
