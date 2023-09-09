@@ -39,7 +39,7 @@ access to the corresponding runtime functions.
 While this feature is not yet available. Rainbow plans to
 support and provide ways to compile to native machine
 code and transpile to binary formats like LLVM, CIL, and
-possibly more (JVM?).
+possibly more (JVM? WASM!?).
 
 # Extended Garbage Collection
 

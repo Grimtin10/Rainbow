@@ -34,19 +34,55 @@ public class Lexer
                         }
 
                         tokens.Add(new Token(current, TokenType.WORD, new string[0]));
+                        current = "";
                     }
 
-                    current = "";
                     break;
                 }
 
                 case '\'':
                 {
+                    if(current.Length > 0)
+                    {
+                        long numeric;
+                        if(long.TryParse(current, out numeric))
+                        {
+                            tokens.Add(new Token(current, TokenType.NUMERIC, new string[0]));
+
+                            current = "";
+
+                            break;
+                        }
+
+                        tokens.Add(new Token(current, TokenType.WORD, new string[0]));
+                        current = "";
+                    }
+
+                    //add character reading logic
+
                     break;
                 }
 
                 case '\"':
                 {
+                    if(current.Length > 0)
+                    {
+                        long numeric;
+                        if(long.TryParse(current, out numeric))
+                        {
+                            tokens.Add(new Token(current, TokenType.NUMERIC, new string[0]));
+
+                            current = "";
+
+                            break;
+                        }
+
+                        tokens.Add(new Token(current, TokenType.WORD, new string[0]));
+                        current = "";
+                    }
+
+                    //add character reading logic
+
                     break;
                 }
 
