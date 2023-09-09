@@ -14,8 +14,4 @@
     <Folder Include="Execution\Parsing\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.Csharp" Version="4.6.0" />
-  </ItemGroup>
-
 </Project>

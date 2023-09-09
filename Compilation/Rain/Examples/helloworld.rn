@@ -1,0 +1,8 @@
+include io;
+
+define mycoolprogram;
+
+int main(params string[] args)
+{
+    writeLn("Hello World!");
+}
