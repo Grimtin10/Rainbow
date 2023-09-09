@@ -1,9 +1,4 @@
 ﻿using Rainbow.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Rainbow.Execution.Math {
     // i heard you like type conversions so i put some type conversions in your type conversions

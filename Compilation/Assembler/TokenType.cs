@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Rainbow.Compilation.Assembler {
+﻿namespace Rainbow.Compilation.Assembler {
     internal enum TokenType {
         TYPE,
         STR,
@@ -14,5 +8,6 @@ namespace Rainbow.Compilation.Assembler {
         RBRACKET,
         LPAREN,
         RPAREN,
+        SYSCALL,
     }
 }

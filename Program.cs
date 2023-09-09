@@ -1,13 +1,4 @@
-﻿using Rainbow.Execution;
-using Rainbow.GarbageCollection;
-using Rainbow.GarbageCollection.GCTypes;
-using Rainbow.SmartAllocation;
-using Rainbow.Types;
-using Rainbow.SmartAllocation.Types;
-using Rainbow.Marshalling;
-using System.Reflection;
-using Rainbow.Handlers;
-using Rainbow.Compilation.Assembler;
+﻿using Rainbow.Compilation.Assembler;
 
 namespace Rainbow;
 

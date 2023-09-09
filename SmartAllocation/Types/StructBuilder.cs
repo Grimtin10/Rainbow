@@ -1,4 +1,3 @@
-using Rainbow.GarbageCollection;
 using Rainbow.GarbageCollection.GCTypes;
 using Rainbow.Types;
 

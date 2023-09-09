@@ -2,7 +2,6 @@
 using Rainbow.Execution.Math;
 using Rainbow.GarbageCollection.GCTypes;
 using Rainbow.Handlers;
-using System;
 using System.Text;
 
 // TODO: split this into multiple files

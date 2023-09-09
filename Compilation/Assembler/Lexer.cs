@@ -1,7 +1,7 @@
 ﻿namespace Rainbow.Compilation.Assembler {
     internal class Lexer {
         public static List<Token> Lex(string[] input) {
-            List<Token> tokens = new List<Token>();
+            List<Token> tokens = new();
 
             for(int i = 0; i < input.Length; i++) {
                 string line = input[i];
@@ -10,6 +10,7 @@
                 for(int j = 0; j < line.Length; j++) {
                     switch(line[j]) {
                         case ' ':
+                        case '$':
                         case ',':
                             if(curString.Trim().Length > 0) {
                                 tokens.Add(TokenizeString(curString.Trim()));
@@ -51,9 +52,12 @@
             return tokens;
         }
 
+        // you might think this could be a switch but you would be wrong
         private static Token TokenizeString(string input) {
             if(types.ContainsKey(input)) {
                 return new Token(TokenType.TYPE, input);
+            } else if(syscalls.ContainsKey(input)) {
+                return new Token(TokenType.SYSCALL, input);
             } else if(instructions.Contains(input)) {
                 return new Token(TokenType.INSTR, input);
             } else if(int.TryParse(input, out _) || long.TryParse(input, out _) || float.TryParse(input, out _) || double.TryParse(input, out _)) {
@@ -71,7 +75,7 @@
             }
         }
 
-        public static Dictionary<String, byte> types = new () {
+        public static Dictionary<string, byte> types = new() {
             { "uint8",   0x00 },
             { "uint16",  0x01 },
             { "uint32",  0x02 },
@@ -90,7 +94,12 @@
             { "void",    0x0F },
         };
 
-        public static List<String> instructions = new () {
+        public static Dictionary<string, byte> syscalls = new() {
+            { "CONOUT", 0x00 },
+            { "READFILE", 0x01 },
+        };
+
+        public static List<string> instructions = new() {
             "NOP",
             "ADD",
             "SUB",
