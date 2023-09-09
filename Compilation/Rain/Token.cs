@@ -19,4 +19,10 @@ public enum TokenType
     STRING,
     CHAR,
     NUMERIC,
+    STAR,
+    PLUS,
+    MINUS,
+    EQUALS,
+    COLON,
+    SLASH
 }
