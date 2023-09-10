@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 namespace Rainbow.Runtime.FFI;
 
 public class Importer
