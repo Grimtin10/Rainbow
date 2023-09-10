@@ -1,6 +1,5 @@
 using Rainbow.GarbageCollection.GCTypes;
 using Rainbow.Marshalling;
-using System.Text;
 
 namespace Rainbow.Runtime;
 

@@ -1,12 +1,4 @@
-﻿using Rainbow.Execution;
-using Rainbow.GarbageCollection;
-using Rainbow.GarbageCollection.GCTypes;
-using Rainbow.SmartAllocation;
-using Rainbow.Types;
-using Rainbow.SmartAllocation.Types;
-using Rainbow.Marshalling;
-using System.Reflection;
-using Rainbow.Handlers;
+﻿using Rainbow.Compilation.Assembler;
 
 namespace Rainbow;
 
@@ -19,8 +11,10 @@ class Program {
                 throw new ArgumentException("Not enough arguments provided! Num args: " + args.Length);
             }
 
-            Executor executor = new Executor(args[0]);
-            executor.Execute();
+            //Executor executor = new Executor(args[0]);
+            //executor.Execute();
+
+            Assembler.Assemble(args[0]);
         }
     }
 

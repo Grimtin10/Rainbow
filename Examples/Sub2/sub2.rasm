@@ -1,6 +1,6 @@
 uint32 main(string* args) {
 	VARDEF uint32 $res
-	SUB 7, 4, $res
+	SUB 742, 468, $res
 	SYSCALL CONOUT $res
 	RET 0
 }

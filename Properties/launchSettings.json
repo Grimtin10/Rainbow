@@ -2,7 +2,7 @@
   "profiles": {
     "Rainbow": {
       "commandName": "Project",
-      "commandLineArgs": "C:\\Users\\Grim\\source\\repos\\Rainbow\\Rainbow\\Examples/sub2/sub2.rbb"
+      "commandLineArgs": "C:\\Users\\Grim\\source\\repos\\Rainbow\\Rainbow\\Examples/sub2/sub2.rasm"
     },
     "RainbowNightly": {
       "commandName": "Project",

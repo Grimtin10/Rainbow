@@ -1,7 +1,4 @@
-﻿using Rainbow.Exceptions;
-using Rainbow.GarbageCollection.GCTypes;
-
-namespace Rainbow.Execution.Math {
+﻿namespace Rainbow.Execution.Math {
     internal class Arithmetic {
         public static void Add(byte type1, byte[] val1, byte type2, byte[] val2, ref Instance var) {
             switch((Type) type1) {
