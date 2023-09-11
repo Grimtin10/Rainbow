@@ -51,4 +51,9 @@ public class ClassInfo
     {
         variableInfo.Add(propertyName, inf);
     }
+
+    public unsafe int SizeOf()
+    {
+        return variableInfo.Count * sizeof(Block<byte>);
+    }
 }

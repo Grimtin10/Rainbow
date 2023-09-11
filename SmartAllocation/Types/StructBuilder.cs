@@ -57,6 +57,18 @@ public class StructInfo
     {
         variableInfo.Add(propertyName, inf);
     }
+
+    public unsafe int SizeOf()
+    {
+        int size = 0;
+
+        foreach(KeyValuePair<string, VariableInfo> inf in variableInfo)
+        {
+            size = size + inf.Value.size;
+        }
+
+        return size;
+    }
 }
 
 public class VariableInfo
