@@ -6,6 +6,8 @@ goal is to achieve complete freedom while still promoting
 safe written code, while also providing the tools to
 do so. 
 
+### [Documentation](/Documentation/TABLEOFCONTENTS.md)
+
 # What is the ideology of the runtime?
 
 The runtime's main goal is to be friendly to both

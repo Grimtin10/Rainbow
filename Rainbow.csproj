@@ -14,4 +14,9 @@
     <Folder Include="Execution\Parsing\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="GammaLib.NET" Version="2023.9.11" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
 </Project>

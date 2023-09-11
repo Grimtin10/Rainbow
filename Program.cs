@@ -1,12 +1,13 @@
 ﻿using Rainbow.Compilation.Assembler;
 using Rainbow.Execution;
+using Newtonsoft.Json;
 
 namespace Rainbow;
 
 class Program {
     public unsafe static void Main(params string[] args) {
         if(args.Contains("nightly")) {
-            Nightly();
+            Nightly(args);
         } else {
             if(args.Length < 1) {
                 throw new ArgumentException("Not enough arguments provided! Num args: " + args.Length);
@@ -20,33 +21,26 @@ class Program {
         }
     }
 
-    public unsafe static void Nightly()
+    public unsafe static void Nightly(string[] args)
     {
-        //string code = @"
-        //    using System;
-        //    using System.IO;
-        //    using System.Collections.Generic;
-            
-        //    namespace Rainbow.GarbageCollection
-        //    {
-        //        public static class GCExtensions
-        //        {
-        //            public static void Clear(this GarbageCollector gc)
-        //            {
-        //                gc.refs = new();
-        //            }
-        //        }
-        //    }
-        //";
+        RuntimeConfig? conf;
+        for(int i = 0; i < args.Length; i++)
+        {
+            if(args[i] == "--conf")
+            {
+                conf = JsonConvert.DeserializeObject<RuntimeConfig>(File.ReadAllText(args[i] + 1));
+                //RunConfigSetup();
+            }
 
-        //RuntimeInjector.InjectPartial(code);
+            if(args[i] == "--write-conf")
+            {
+                List<LinkerArgs> linkerArgs = new();
+                linkerArgs.Add(new LinkerArgs("MyCoolLib.dll"));
+                linkerArgs.Add(new LinkerArgs("MyAwesomeLib.so"));
+                linkerArgs.Add(new LinkerArgs("MyFantasticLib.rbb", true));
 
-        //typeof(GarbageCollector).InvokeMember(
-        //    "Clear",
-        //    BindingFlags.Default | BindingFlags.InvokeMethod,
-        //    null,
-        //    Globals.GarbageCollector,
-        //    null
-        //);
+                File.WriteAllText("./exampleconfig.json", JsonConvert.SerializeObject(new RuntimeConfig(true, new AssemblerArgs(linkerArgs))));
+            }
+        }
     }
 }

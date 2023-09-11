@@ -1,0 +1,20 @@
+{
+    "useGc":true,
+    "asmArgs": {
+        "linkerArgs": [
+            {
+                "path":"MyCoolLib.dll",
+                "isStatic":false
+            },
+            {
+                "path":"MyAwesomeLib.so",
+                "isStatic":false
+            },
+            {
+                "path":"MyFantasticLib.rbb",
+                "isStatic":true
+            }
+        ],
+        "aotCast":false
+    }
+}
