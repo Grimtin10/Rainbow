@@ -1,4 +1,5 @@
 ﻿using Rainbow.Compilation.Assembler;
+using Rainbow.Execution;
 
 namespace Rainbow;
 
@@ -11,10 +12,11 @@ class Program {
                 throw new ArgumentException("Not enough arguments provided! Num args: " + args.Length);
             }
 
-            //Executor executor = new Executor(args[0]);
-            //executor.Execute();
+            byte[] bytes = Assembler.Assemble(args[0]);
+            File.WriteAllBytes("C:\\Users\\Grim\\source\\repos\\Rainbow\\Rainbow\\Examples\\Sub2\\sub2.rbb", bytes);
 
-            Assembler.Assemble(args[0]);
+            Executor executor = new Executor(bytes);
+            executor.Execute();
         }
     }
 

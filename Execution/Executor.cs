@@ -18,6 +18,18 @@ namespace Rainbow.Execution {
             Console.WriteLine("Parsing program took " + stopwatch.ElapsedMilliseconds + "ms");
         }
 
+        public Executor(byte[] program) {
+            this.program = program;
+
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            globalScope = new Scope(program, null);
+            globalScope.isGlobal = true;
+            stopwatch.Stop();
+
+            Console.WriteLine("Parsing program took " + stopwatch.ElapsedMilliseconds + "ms");
+        }
+
         public void Execute() {
             globalScope.Execute();
         }

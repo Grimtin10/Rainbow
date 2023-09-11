@@ -65,6 +65,7 @@
                     sub.SubInt16(conv.ToInt16(val1), type2, val2, ref var);
                     break;
                 case Type.int32:
+                    Console.WriteLine("val1 " + conv.ToInt32(val1));
                     sub.SubInt32(conv.ToInt32(val1), type2, val2, ref var);
                     break;
                 case Type.int64:

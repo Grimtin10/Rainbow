@@ -9,14 +9,23 @@ public static class Converter
     }
 
     public static ushort ToUInt16(byte[] arr) {
+        if(BitConverter.IsLittleEndian) {
+            Array.Reverse(arr);
+        }
         return BitConverter.ToUInt16(arr, 0);
     }
 
     public static uint ToUInt32(byte[] arr) {
+        if(BitConverter.IsLittleEndian) {
+            Array.Reverse(arr);
+        }
         return BitConverter.ToUInt32(arr, 0);
     }
 
     public static ulong ToUInt64(byte[] arr) {
+        if(BitConverter.IsLittleEndian) {
+            Array.Reverse(arr);
+        }
         return BitConverter.ToUInt64(arr, 0);
     }
 
@@ -25,14 +34,23 @@ public static class Converter
     }
 
     public static short ToInt16(byte[] arr) {
+        if(BitConverter.IsLittleEndian) {
+            Array.Reverse(arr);
+        }
         return BitConverter.ToInt16(arr, 0);
     }
 
     public static int ToInt32(byte[] arr) {
+        if(BitConverter.IsLittleEndian) {
+            Array.Reverse(arr);
+        }
         return BitConverter.ToInt32(arr, 0);
     }
 
     public static long ToInt64(byte[] arr) {
+        if(BitConverter.IsLittleEndian) {
+            Array.Reverse(arr);
+        }
         return BitConverter.ToInt64(arr, 0);
     }
 
@@ -55,7 +73,7 @@ public static class Converter
     }
 
     public static char ToChar(byte[] arr) {
-        return (char) arr[0]; // i'd use bitconverter but chars arer UTF-16 so
+        return (char) arr[0]; // i'd use bitconverter but chars are UTF-16 so
     }
 
     // these are all just wrapper functions

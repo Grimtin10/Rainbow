@@ -445,6 +445,7 @@ namespace Rainbow.Execution.Math {
                     break;
                 }
                 case Type.int32: {
+                    Console.WriteLine("val2: " + conv.ToInt32(val2));
                     int v = conv.ToInt32(val2);
                     Move.SetInt32(val1 - v, ref _var);
                     break;

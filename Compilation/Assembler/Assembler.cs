@@ -1,11 +1,15 @@
 ﻿using Rainbow.Exceptions;
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Text;
 
 namespace Rainbow.Compilation.Assembler {
     public class Assembler {
         public static byte[] Assemble(string file) {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             string[] asm = File.ReadAllLines(file);
 
             List<byte> output = new();
@@ -17,7 +21,6 @@ namespace Rainbow.Compilation.Assembler {
             int funcOffset = 0;
             uint byteCount = 0;
             for(int i = 0; i < tokens.Count; i++) {
-                Console.WriteLine(tokens[i]);
                 if(tokens[i].type == TokenType.TYPE) {
                     if(tokens[i + 2].type == TokenType.LPAREN) {
                         output.Add(0xFF);
@@ -99,6 +102,10 @@ namespace Rainbow.Compilation.Assembler {
                 }
             }
 
+            stopwatch.Stop();
+
+            Console.WriteLine("Assembling program took " + stopwatch.ElapsedMilliseconds + "ms");
+
             return output.ToArray();
         }
 
@@ -123,34 +130,37 @@ namespace Rainbow.Compilation.Assembler {
 
                     byte[] bytes1;
                     byte[] bytes2;
+                    byte[] bytes3;
+
+                    bytes3 = StrToBytes(tokens[i + 3].value);
 
                     if(!arg1 && !arg2) {
                         bytes1 = StrToBytes(tokens[i + 1].value);
                         bytes2 = StrToBytes(tokens[i + 2].value);
 
-                        res = new byte[bytes1.Length + bytes2.Length + 1];
+                        res = new byte[bytes1.Length + bytes2.Length + bytes3.Length + 1];
 
                         res[0] = 0x05;
-                    } else if(arg1 && !arg2) {
-                        bytes1 = ValToBytes(tokens[i + 1]);
-                        bytes2 = StrToBytes(tokens[i + 2].value);
-
-                        res = new byte[bytes1.Length + bytes2.Length + 1];
-
-                        res[0] = 0x06;
-
                     } else if(!arg1 && arg2) {
                         bytes1 = StrToBytes(tokens[i + 1].value);
                         bytes2 = ValToBytes(tokens[i + 2]);
 
-                        res = new byte[bytes1.Length + bytes2.Length + 1];
+                        res = new byte[bytes1.Length + bytes2.Length + bytes3.Length + 1];
+
+                        res[0] = 0x06;
+
+                    } else if(arg1 && arg2) {
+                        bytes1 = ValToBytes(tokens[i + 1]);
+                        bytes2 = StrToBytes(tokens[i + 2].value);
+
+                        res = new byte[bytes1.Length + bytes2.Length + bytes3.Length + 1];
 
                         res[0] = 0x07;
                     } else {
                         bytes1 = ValToBytes(tokens[i + 1]);
                         bytes2 = ValToBytes(tokens[i + 2]);
 
-                        res = new byte[bytes1.Length + bytes2.Length + 1];
+                        res = new byte[bytes1.Length + bytes2.Length + bytes3.Length + 1];
 
                         res[0] = 0x08;
                     }
@@ -162,8 +172,11 @@ namespace Rainbow.Compilation.Assembler {
                     for(int j = 0; j < bytes2.Length; j++, off++) {
                         res[off] = bytes2[j];
                     }
+                    for(int j = 0; j < bytes3.Length; j++, off++) {
+                        res[off] = bytes3[j];
+                    }
 
-                    i += 2;
+                    i += 3;
 
                     break;
                 }
@@ -224,17 +237,20 @@ namespace Rainbow.Compilation.Assembler {
                 case "SYSCALL": {
                     bool arg1 = GetArgType(tokens[i + 1]);
                     byte[] bytes1;
+                    byte[] bytes2;
+
+                    bytes2 = StrToBytes(tokens[i + 2].value);
 
                     if(!arg1) {
                         bytes1 = StrToBytes(tokens[i + 1].value);
 
-                        res = new byte[bytes1.Length + 1];
+                        res = new byte[bytes1.Length + bytes2.Length + 1];
 
                         res[0] = 0x3A;
                     } else {
                         bytes1 = ValToBytes(tokens[i + 1]);
 
-                        res = new byte[bytes1.Length + 1];
+                        res = new byte[bytes1.Length + bytes2.Length + 1];
 
                         res[0] = 0x3B;
                     }
@@ -243,8 +259,11 @@ namespace Rainbow.Compilation.Assembler {
                     for(int j = 0; j < bytes1.Length; j++, off++) {
                         res[off] = bytes1[j];
                     }
+                    for(int j = 0; j < bytes2.Length; j++, off++) {
+                        res[off] = bytes2[j];
+                    }
 
-                    i++;
+                    i += 2;
                     break;
                 }
                 default:
