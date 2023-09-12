@@ -14,7 +14,7 @@ class Program {
             }
 
             byte[] bytes = Assembler.Assemble(args[0]);
-            File.WriteAllBytes("C:\\Users\\Grim\\source\\repos\\Rainbow\\Rainbow\\Examples\\Sub2\\sub2.rbb", bytes);
+            File.WriteAllBytes($"C:/Users/{System.Environment.UserName}/source/repos/Rainbow/Rainbow/Examples/Sub2/sub2.rbb", bytes);
 
             Executor executor = new Executor(bytes);
             executor.Execute();
