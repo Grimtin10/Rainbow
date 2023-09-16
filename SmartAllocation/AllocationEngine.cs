@@ -107,6 +107,8 @@ public class AllocationEngine
         runThreadedCollection = false;
     }
 
+    #region Runtime Allowed Funcs
+    
     public void RuntimeSuspendGC()
     {
         gc.canCollect = false;
@@ -116,4 +118,6 @@ public class AllocationEngine
     {
         gc.canCollect = true;
     }
+
+    #endregion
 }

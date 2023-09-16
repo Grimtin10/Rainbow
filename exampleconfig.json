@@ -16,5 +16,6 @@
             }
         ],
         "aotCast":false
-    }
+    },
+    "threadedGc":false
 }
