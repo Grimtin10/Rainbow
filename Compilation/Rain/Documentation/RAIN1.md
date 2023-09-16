@@ -3,7 +3,7 @@ Rain language mockups for version 1
 
 # Table Of Contents
 - [Top Level Statements](#top-level-statements)
-- - [Structs](#structs)
+  - [Structs](#structs)
   - [Classes](#classes)
   - [Usage of Data Types](#usage-of-data-types)
   - [Constructors](#constructors)
