@@ -75,4 +75,5 @@ Here are our plans for Rainbow:
 
 ### Developer Quote
 
-Rainbow: does what it shouldn't!
+Rainbow: does what it shouldn't!<br>
+Rainbow: JMP 0 is ``while(true);``

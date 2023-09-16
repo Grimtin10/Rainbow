@@ -30,6 +30,18 @@ struct Person
 ```
 
 ### Classes
+Classes in Rain behave similarly to how
+you would expect any class to behave. They
+are simply blocks of memory on the heap!
+
+```cs
+class Color
+{
+    int r { get; set; }
+    int g { get; set; }
+    int b { get; set; }
+}
+```
 
 ### Constructors
 Constructors provide a way to define initialization code
@@ -136,10 +148,132 @@ class BigClass
 ```
 
 ### Struct/Class Getters/Setters
+Rain brings a new syntactical sugar to the table in the
+form of getters and setters for the entirety of classes.
+This allowes you to write a logic that is run whenever a
+variable is accessed.
+
+```cs
+struct Person { get; set; }
+{
+    string name { get; set; }
+    int age { get; set; }
+
+    Person get
+    {
+        return this;
+    }
+
+    set(Person p) {
+        this = p
+    }
+
+    Person(default);
+}
+```
+
+#### Immutable Types Using Getters/Setters
+Data types alternatively have the ``init`` 
+setter. Init is a setter that can only be
+called once.
+
+```cs
+class Person { get; init; }
+{
+    string name { get; set; }
+    int age { get; set; }
+
+    Person get
+    {
+        return this;
+    }
+
+    set(Person p) {
+        this = new Person(p.fields);
+    }
+
+    Person(default);
+}
+```
+
+#### Hiding Immutability (string example)
+You can make fake mutability through setters. A good
+example of this is the string struct:
+
+```cs
+struct string { get; set; }
+{
+    private ref char[] ptr { get; set; }
+    readonly int length => ptr.length;
+
+    T this[int index]
+    {
+
+    }
+
+    string get {
+        return this;
+    }
+
+    char[] get {
+        return ptr;
+    }
+
+    set(char[] value) {
+        ptr = new ref char[value.length];
+        
+        for(int i = 0; i < ptr.length; i++)
+        {
+            ptr[i] = value[i];
+        }
+    }
+}
+```
 
 ## Templates
+Templates provide a layout for a class without
+having the ability to be an instance. They simply
+extend a class. Equivelant would be interfaces in
+C#/Java.
+
+```cpp
+template PersonTemplate
+{
+    string name { get; set; }
+    int age { get; set; }
+}
+
+class Person : PersonTemplate
+{
+    int height { get; set; }
+
+    Person(default)
+    {
+        this.fields = default;
+    }
+}
+```
 
 ## Methods
+Methods in Rain are just what youd expect
+from any language. C styled and basic!
+
+```cs
+int main(params string[] args)
+{
+    for(int i = 0; i < args.length; i++)
+    {
+        if(args[i] == "Foo")
+        {
+            return 1;
+        }
+    }
+}
+```
+
+### Static Class Methods
+
+### Private Methods
 
 ## IL
 
@@ -148,6 +282,8 @@ class BigClass
 ## Ref
 
 ### Fixed Refs
+
+### Unsafe Refs
 
 ## C Styled Pointers
 

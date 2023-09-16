@@ -7,10 +7,12 @@ global using sub = Rainbow.Execution.Math.Subtraction;
 
 using Rainbow.GarbageCollection;
 using Rainbow.GarbageCollection.GCTypes;
+using Rainbow.SmartAllocation;
 
 namespace Rainbow.Handlers {
     public class Globals {
         public static GarbageCollector GarbageCollector = new();
         public static Block<byte> filePtr { get; set; }
+        public static AllocationEngine ae = new(ref GarbageCollector);
     }
 }
