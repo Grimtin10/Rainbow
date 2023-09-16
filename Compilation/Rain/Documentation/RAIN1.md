@@ -47,6 +47,22 @@ class Color
 Constructors provide a way to define initialization code
 for classes and structs.
 
+```cs
+class Car
+{
+    string make { get; set; }
+    string model { get; set; }
+}
+```
+
+### Usage of Data Types
+Declaring instances of a variable/object is quite easy
+in Rain. Just make usage of the ``new`` keyword:
+
+```cs
+Person p = new Person("Jeremy", 45);
+```
+
 #### Default keyword
 Constructors in Rain bring new syntactical functionality
 to the table by making use of the ``default`` keyword! Usage
@@ -180,20 +196,33 @@ called once.
 ```cs
 class Person { get; init; }
 {
-    string name { get; set; }
-    int age { get; set; }
+    // all variables within an "init only" class must also be init only
+    string name { get; init; }
+    int age { get; init; }
 
     Person get
     {
         return this;
     }
 
-    set(Person p) {
+    init(Person p) {
         this = new Person(p.fields);
     }
 
     Person(default);
 }
+```
+
+And now we can take a look at what using the
+variable is like!
+
+```cs
+Person person = new Person("John", 35);
+
+person.name = "Hello!"; // this is illegal
+person = new Person("Robert", 27); // also illegal
+
+Person p = person; // totally legal
 ```
 
 #### Hiding Immutability (string example)
@@ -208,7 +237,13 @@ struct string { get; set; }
 
     T this[int index]
     {
+        get {
+            return ptr[index];
+        }
 
+        set(char value) {
+            ptr[index] = value;
+        }
     }
 
     string get {
