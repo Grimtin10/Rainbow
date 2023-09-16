@@ -3,9 +3,24 @@ Rain language mockups for version 1
 
 # Table Of Contents
 - [Top Level Statements](#top-level-statements)
+- - [Structs](#structs)
+  - [Classes](#classes)
+  - [Usage of Data Types](#usage-of-data-types)
+  - [Constructors](#constructors)
+    - [Default Keyword](#default-keyword)
+    - [Intrinsic this.fields Property](#intrisic-thisfields-property)
 - [Pointers and Reference Types](#pointers-and-reference-types)
+  - [Ref](#ref)
+    - [Fixed Refs](#fixed-refs)
+    - [Unsafe Refs](#unsafe-refs)
+  - [C Style Pointers](#c-styled-pointers)
 - [Libraries](#libraries)
+  - [Imports](#imports)
+    - [AOT Imports](#aot-imports)
+  - [Module Definitions](#module-definitions)
 - [Intrinsic Types and Methods](#intrinsic-types-and-methods)
+  - [Sizeof](#sizeof)
+  - [Runtime Variable](#runtime-variable)
 - [Overrides](#overrides)
 
 
@@ -46,6 +61,14 @@ class Color
 }
 ```
 
+### Usage of Data Types
+Declaring instances of a variable/object is quite easy
+in Rain. Just make usage of the ``new`` keyword:
+
+```cs
+Person p = new Person("Jeremy", 45);
+```
+
 ### Constructors
 Constructors provide a way to define initialization code
 for classes and structs.
@@ -56,14 +79,6 @@ class Car
     string make { get; set; }
     string model { get; set; }
 }
-```
-
-### Usage of Data Types
-Declaring instances of a variable/object is quite easy
-in Rain. Just make usage of the ``new`` keyword:
-
-```cs
-Person p = new Person("Jeremy", 45);
 ```
 
 #### Default keyword
@@ -141,7 +156,7 @@ class BigClass
 }
 ```
 
-#### Intrisic this.fields Parameter
+#### Intrisic this.fields Property
 Each datatype has an auto created ``this.fields`` parameter
 that you can assign the ``default`` keyword to. This way you
 can quickly set the fields of a class within a constructor
@@ -506,6 +521,8 @@ runtime.free(str);
 ## Module Definitions
 
 # Intrinsic Types and Methods
+
+## Sizeof
 
 ## Runtime Variable
 
