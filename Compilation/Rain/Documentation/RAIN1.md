@@ -8,7 +8,7 @@ Rain language mockups for version 1
 
 # Top Level Statements
 Top level statements incude [structs](#structs), [classes](#classes), [methods](#methods),
-and [IL](#il).
+[templates](#templates), and [IL](#il).
 
 ## Data Types
 Data types in Rain are definable structures like
@@ -137,6 +137,8 @@ class BigClass
 
 ### Struct/Class Getters/Setters
 
+## Templates
+
 ## Methods
 
 ## IL
@@ -154,3 +156,5 @@ class BigClass
 # Intrinsic Types and Methods
 
 # Overrides
+
+# Runtime Variable
