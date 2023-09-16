@@ -2,31 +2,36 @@ using System.Text;
 
 namespace Rainbow.Marshalling;
 
-public static class Converter
-{
+public static class Converter {
     public static byte ToUInt8(byte[] arr) {
         return arr[0];
     }
 
     public static ushort ToUInt16(byte[] arr) {
+        byte[] copy = new byte[arr.Length];
+        Array.Copy(arr, copy, arr.Length);
         if(BitConverter.IsLittleEndian) {
-            Array.Reverse(arr);
+            Array.Reverse(copy);
         }
-        return BitConverter.ToUInt16(arr, 0);
+        return BitConverter.ToUInt16(copy);
     }
 
     public static uint ToUInt32(byte[] arr) {
+        byte[] copy = new byte[arr.Length];
+        Array.Copy(arr, copy, arr.Length);
         if(BitConverter.IsLittleEndian) {
-            Array.Reverse(arr);
+            Array.Reverse(copy);
         }
-        return BitConverter.ToUInt32(arr, 0);
+        return BitConverter.ToUInt32(copy);
     }
 
     public static ulong ToUInt64(byte[] arr) {
+        byte[] copy = new byte[arr.Length];
+        Array.Copy(arr, copy, arr.Length);
         if(BitConverter.IsLittleEndian) {
-            Array.Reverse(arr);
+            Array.Reverse(copy);
         }
-        return BitConverter.ToUInt64(arr, 0);
+        return BitConverter.ToUInt64(copy);
     }
 
     public static sbyte ToInt8(byte[] arr) {
@@ -34,38 +39,42 @@ public static class Converter
     }
 
     public static short ToInt16(byte[] arr) {
+        byte[] copy = new byte[arr.Length];
+        Array.Copy(arr, copy, arr.Length);
         if(BitConverter.IsLittleEndian) {
-            Array.Reverse(arr);
+            Array.Reverse(copy);
         }
-        return BitConverter.ToInt16(arr, 0);
+        return BitConverter.ToInt16(copy);
     }
 
     public static int ToInt32(byte[] arr) {
+        byte[] copy = new byte[arr.Length];
+        Array.Copy(arr, copy, arr.Length);
         if(BitConverter.IsLittleEndian) {
-            Array.Reverse(arr);
+            Array.Reverse(copy);
         }
-        return BitConverter.ToInt32(arr, 0);
+        return BitConverter.ToInt32(copy);
     }
 
     public static long ToInt64(byte[] arr) {
+        byte[] copy = new byte[arr.Length];
+        Array.Copy(arr, copy, arr.Length);
         if(BitConverter.IsLittleEndian) {
-            Array.Reverse(arr);
+            Array.Reverse(copy);
         }
-        return BitConverter.ToInt64(arr, 0);
+        return BitConverter.ToInt64(copy);
     }
 
     public static half ToFloat16(byte[] arr) {
-        return BitConverter.ToHalf(arr, 0);
+        return BitConverter.ToHalf(arr);
     }
 
-    public static float ToFloat32(byte[] arr)
-    {
-        return BitConverter.ToSingle(arr, 0);
+    public static float ToFloat32(byte[] arr) {
+        return BitConverter.ToSingle(arr);
     }
 
-    public static double ToFloat64(byte[] arr)
-    {
-        return BitConverter.ToDouble(arr, 0);
+    public static double ToFloat64(byte[] arr) {
+        return BitConverter.ToDouble(arr);
     }
 
     public static string ToString(byte[] arr) {
@@ -80,27 +89,51 @@ public static class Converter
     // they make my code shorter so
     #region getbytes
     public static byte[] GetBytes(short b) {
-        return BitConverter.GetBytes(b);
+        byte[] bytes = BitConverter.GetBytes(b);
+        if(BitConverter.IsLittleEndian) {
+            Array.Reverse(bytes);
+        }
+        return bytes;
     }
 
     public static byte[] GetBytes(int b) {
-        return BitConverter.GetBytes(b);
+        byte[] bytes = BitConverter.GetBytes(b);
+        if(BitConverter.IsLittleEndian) {
+            Array.Reverse(bytes);
+        }
+        return bytes;
     }
 
     public static byte[] GetBytes(long b) {
-        return BitConverter.GetBytes(b);
+        byte[] bytes = BitConverter.GetBytes(b);
+        if(BitConverter.IsLittleEndian) {
+            Array.Reverse(bytes);
+        }
+        return bytes;
     }
 
     public static byte[] GetBytes(ushort b) {
-        return BitConverter.GetBytes(b);
+        byte[] bytes = BitConverter.GetBytes(b);
+        if(BitConverter.IsLittleEndian) {
+            Array.Reverse(bytes);
+        }
+        return bytes;
     }
 
     public static byte[] GetBytes(uint b) {
-        return BitConverter.GetBytes(b);
+        byte[] bytes = BitConverter.GetBytes(b);
+        if(BitConverter.IsLittleEndian) {
+            Array.Reverse(bytes);
+        }
+        return bytes;
     }
 
     public static byte[] GetBytes(ulong b) {
-        return BitConverter.GetBytes(b);
+        byte[] bytes = BitConverter.GetBytes(b);
+        if(BitConverter.IsLittleEndian) {
+            Array.Reverse(bytes);
+        }
+        return bytes;
     }
 
     public static byte[] GetBytes(half b) {

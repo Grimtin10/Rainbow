@@ -1,4 +1,5 @@
 ﻿using Rainbow.GarbageCollection.GCTypes;
+using Rainbow.Marshalling;
 
 namespace Rainbow.Execution {
     // TODO: reference counting
@@ -20,7 +21,7 @@ namespace Rainbow.Execution {
             data.SetPos(i, b);
         }
 
-        public void FillBytes(byte[] bytes) { 
+        public void FillBytes(byte[] bytes) {
             data.FillBytes(bytes);
         }
     }

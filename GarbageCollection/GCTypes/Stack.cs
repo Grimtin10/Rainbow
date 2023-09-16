@@ -43,8 +43,8 @@ public unsafe struct StackBlock
 
         currentBlockSize = ptr.length;
 
-        Console.WriteLine(bt.isref + " " + ptr.isref);
-        Console.WriteLine(bt.ToString() + " " + ptr.ToString());
+        //Console.WriteLine(bt.isref + " " + ptr.isref);
+        //Console.WriteLine(bt.ToString() + " " + ptr.ToString());
 
         return bt;
     }
