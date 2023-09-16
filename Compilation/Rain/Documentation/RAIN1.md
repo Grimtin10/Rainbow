@@ -437,6 +437,26 @@ ref int x = ref 5;
 ref int y = ref x;
 ```
 
+The ``ref`` keyword can also be used to allocate a block of a type
+on the heap by allocating an array:
+
+```cs
+ref byte[] buff = ref new byte[100];
+```
+
+But you can allocate an array of refs on the stack by doing this:
+
+```cs
+ref[] byte bytePtrs = new ref byte[5];
+```
+
+And of course this allows us to create pointer chains:
+
+```cs
+ref[][][] byte refChain = new ref byte[1][1][1];
+x[0][0][0] = ref 0x05;
+```
+
 ### Fixed Refs
 Automatically dereferenced ``ref``s can get annoying! So Rain
 provides a fix in the form of ``fixed ref`` types. A ``fixed ref``
@@ -465,6 +485,17 @@ runtime.free(ptr); // you can also do runtime.free(x);
 ```
 
 ## C Styled Pointers
+Rain supports C styled pointers and provides allocations methods
+to interact with them through the [runtime variable](#runtime-variable)
+
+```cs
+char *str = runtime.alloc(sizeof(char) * 3);
+*str = "Hi!"; // "" returns a char[], however, the compiler and rain both do not know the difference between the 2
+
+io.conout(str);
+
+runtime.free(str);
+```
 
 # Libraries
 
