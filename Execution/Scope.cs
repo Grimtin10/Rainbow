@@ -2,6 +2,7 @@
 using Rainbow.Execution.Math;
 using Rainbow.GarbageCollection.GCTypes;
 using Rainbow.Handlers;
+using Rainbow.Marshalling;
 using System;
 using System.Diagnostics;
 using System.Text;
@@ -87,16 +88,18 @@ namespace Rainbow.Execution {
         public void Execute() {
             stackStart = Globals.GarbageCollector.stack.ptrs.Count;
 
-            foreach(KeyValuePair<Instruction, byte[]> instruction in instructions) {
-                //Console.Write(instruction.Key.ToString() + " ");
-                foreach(byte b in instruction.Value) {
-                    //Console.Write(b.ToString("X2") + " ");
-                }
-                //Console.WriteLine();
-                if(ExecInstruction(instruction)) {
+            for(int i=0; i<instructions.Count;i++) {
+                KeyValuePair<Instruction, byte[]> instruction = instructions[i];
+
+                // if i'm being honest this feels jank but i'm just working with what i have
+                // (i wrote it)
+                int ret = ExecInstruction(instruction);
+                if(ret == -1) {
                     // we returned, stop execution
                     Cleanup();
                     return;
+                } else if(ret >= 0) {
+                    i = ret - 1;
                 }
             }
 
@@ -118,6 +121,8 @@ namespace Rainbow.Execution {
 
         private void Cleanup() {
             Console.WriteLine("Cleaning up scope");
+
+            // TODO: force enable GC
             while(Globals.GarbageCollector.stack.ptrs.Count > stackStart) {
                 Globals.GarbageCollector.stack.Pop();
             }
@@ -127,13 +132,32 @@ namespace Rainbow.Execution {
             Globals.GarbageCollector.Collect();
         }
 
-        private bool ExecInstruction(KeyValuePair<Instruction, byte[]> instruction) {
+        private int ExecInstruction(KeyValuePair<Instruction, byte[]> instruction) {
             Instruction instr = instruction.Key;
             byte[] args = instruction.Value;
 
             int index = 0;
 
             switch((byte) instr) {
+                case 0x01: {
+                    Instance? arg1 = GetRef(GetSTR(args, ref index));
+                    if(arg1 == null) {
+                        throw new NullRefException();
+                    }
+
+                    Instance? arg2 = GetRef(GetSTR(args, ref index));
+                    if(arg2 == null) {
+                        throw new NullRefException();
+                    }
+
+                    Instance? var = GetRef(GetSTR(args, ref index));
+                    if(var == null) {
+                        throw new NullRefException();
+                    }
+
+                    Arithmetic.Add((byte) arg1.type[0], arg1.data.GetBytes(), (byte) arg2.type[0], arg2.data.GetBytes(), ref var);
+                    break;
+                }
                 case 0x02: {
                     Instance? arg1 = GetRef(GetSTR(args, ref index));
                     if(arg1 == null) {
@@ -165,6 +189,25 @@ namespace Rainbow.Execution {
                     Arithmetic.Add(type1, bytes1, type2, bytes2, ref var);
                     break;
                 }
+                case 0x05: {
+                    Instance? arg1 = GetRef(GetSTR(args, ref index));
+                    if(arg1 == null) {
+                        throw new NullRefException();
+                    }
+
+                    Instance? arg2 = GetRef(GetSTR(args, ref index));
+                    if(arg2 == null) {
+                        throw new NullRefException();
+                    }
+
+                    Instance? var = GetRef(GetSTR(args, ref index));
+                    if(var == null) {
+                        throw new NullRefException();
+                    }
+
+                    Arithmetic.Sub((byte) arg1.type[0], arg1.data.GetBytes(), (byte) arg2.type[0], arg2.data.GetBytes(), ref var);
+                    break;
+                }
                 case 0x06: {
                     Instance? arg1 = GetRef(GetSTR(args, ref index));
                     if(arg1 == null) {
@@ -182,6 +225,23 @@ namespace Rainbow.Execution {
                     Arithmetic.Sub((byte) arg1.type[0], arg1.data.GetBytes(), type2, bytes2, ref var);
                     break;
                 }
+                case 0x07: {
+                    byte type1 = args[index++];
+                    byte[] bytes1 = GetBytes(args, type1, ref index);
+
+                    Instance? arg2 = GetRef(GetSTR(args, ref index));
+                    if(arg2 == null) {
+                        throw new NullRefException();
+                    }
+
+                    Instance? var = GetRef(GetSTR(args, ref index));
+                    if(var == null) {
+                        throw new NullRefException();
+                    }
+
+                    Arithmetic.Sub(type1, bytes1, (byte) arg2.type[0], arg2.data.GetBytes(), ref var);
+                    break;
+                }
                 case 0x08: {
                     byte type1 = args[index++];
                     byte[] bytes1 = GetBytes(args, type1, ref index);
@@ -196,9 +256,19 @@ namespace Rainbow.Execution {
                     Arithmetic.Sub(type1, bytes1, type2, bytes2, ref var);
                     break;
                 }
+                case 0x1C: {
+                    byte type = args[index++];
+                    byte[] bytes = GetBytes(args, type, ref index);
+
+                    if(type != 0x06) {
+                        throw new InvalidArgumentException("JMP expects int32 as args");
+                    }
+
+                    return Converter.ToInt32(bytes);
+                }
                 case 0x2F: {
                     // TODO: actually get return value
-                    return true;
+                    return -1;
                 }
                 case 0x39: { // VALUE
                     Type[] type = GetType(args, ref index);
@@ -233,7 +303,7 @@ namespace Rainbow.Execution {
                     throw new UnhandledArgumentException($"Unhandled instruction {instr} (0x{(byte) instr:X2})");
             }
 
-            return false;
+            return -999; // it just needs to be negative to tell the runtime to not jump anywhere
         }
 
         public Instance? GetRef(string name) {

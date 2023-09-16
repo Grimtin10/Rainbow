@@ -17,6 +17,12 @@
                                 curString = "";
                             }
                             break;
+                        case ';':
+                            if(curString.Trim().Length > 0) {
+                                tokens.Add(TokenizeString(curString.Trim()));
+                                curString = "";
+                            }
+                            goto exit;
                         case '*':
                             if(curString.Trim().Length > 0) {
                                 tokens.Add(TokenizeString(curString.Trim()));
@@ -44,6 +50,7 @@
                     }
                 }
 
+                exit:
                 if(curString.Trim().Length > 0) {
                     tokens.Add(TokenizeString(curString.Trim()));
                 }

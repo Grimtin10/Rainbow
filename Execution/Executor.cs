@@ -31,7 +31,12 @@ namespace Rainbow.Execution {
         }
 
         public void Execute() {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
             globalScope.Execute();
+            stopwatch.Stop();
+
+            Console.WriteLine("Executing program took " + stopwatch.ElapsedMilliseconds + "ms");
         }
     }
 }

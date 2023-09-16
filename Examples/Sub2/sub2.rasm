@@ -1,10 +1,12 @@
+; this subtracts numbers *forever*
+VARDEF int32 $res
+VARDEF int32 $res2
+SUB 1, 0, $res
+SYSCALL CONOUT $res
+
 uint32 main(string* args) {
-	VARDEF int32 $res
-	SUB 20, 5, $res
-	SYSCALL CONOUT $res
-	SUB $res, 10, $res
-	SYSCALL CONOUT $res
-	ADD $res, 25, $res
+	SUB 0, $res, $res2
+	SUB $res2, $res, $res
 	SYSCALL CONOUT $res
 	RET 0
 }

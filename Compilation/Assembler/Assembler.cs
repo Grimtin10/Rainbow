@@ -246,6 +246,36 @@ namespace Rainbow.Compilation.Assembler {
 
                     break;
                 }
+                case "JMP": {
+                    if(tokens[i + 1].type != TokenType.STR && tokens[i + 1].type != TokenType.VALUE) {
+                        throw new InvalidArgumentException($"Invalid argument type {tokens[i + 1].type} at token {i}");
+                    }
+
+                    bool arg1 = GetArgType(tokens[i + 1]);
+
+                    byte[] bytes1;
+
+                    if(!arg1) {
+                        bytes1 = StrToBytes(tokens[i + 1].value);
+
+                        res = new byte[bytes1.Length + 1];
+                        res[0] = 0x1B;
+                    } else {
+                        bytes1 = ValToBytes(tokens[i + 1]);
+
+                        res = new byte[6];
+                        res[0] = 0x1C;
+                    }
+
+                    int off = 1;
+                    for(int j = 0; j < bytes1.Length; j++, off++) {
+                        res[off] = bytes1[j];
+                    }
+
+                    i++;
+
+                    break;
+                }
                 case "RET": {
                     if(tokens[i + 1].type != TokenType.STR && tokens[i + 1].type != TokenType.VALUE) {
                         res = new byte[] { 0x2F, 0x00 };
