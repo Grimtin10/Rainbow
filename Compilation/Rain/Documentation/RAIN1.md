@@ -110,6 +110,31 @@ class BigClass
 }
 ```
 
+#### Intrisic this.fields Parameter
+Each datatype has an auto created ``this.fields`` parameter
+that you can assign the ``default`` keyword to. This way you
+can quickly set the fields of a class within a constructor
+body.
+
+```cs
+class BigClass
+{
+    int a { get; set; }
+    int b { get; set; }
+    int c { get; set; }
+    int d { get; set; }
+    int e { get; set; }
+    int f { get; set; }
+    int g { get; set; }
+
+    BigClass(default)
+    {
+        this.fields = default;
+        this.g = default.a + default.b;
+    }
+}
+```
+
 ### Struct/Class Getters/Setters
 
 ## Methods
