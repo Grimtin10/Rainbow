@@ -110,7 +110,7 @@ class BigClass
 }
 ```
 
-### Classwide Getters/Setters
+### Struct/Class Getters/Setters
 
 ## Methods
 
