@@ -12,10 +12,9 @@
             2, // float16
             4, // float32
             8, // float64
-            1, // string
-            1, // object
             1, // char
             8, // pointer
+            1, // struct
             0, // void
             0, // undefined
         };  
@@ -33,10 +32,9 @@
         float16,
         float32,
         float64,
-        _string,
-        _object,
         _char,
         pointer,
+        _struct,
         _void,
         undefined 
     }

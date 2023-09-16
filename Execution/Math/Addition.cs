@@ -33,9 +33,6 @@ namespace Rainbow.Execution.Math {
                     Move.SetUInt8((byte) (val1 + v), ref _var);
                     break;
                 }
-                case Type._string: {
-                    throw new InvalidTypeException("Cannot convert from string to uint8");
-                }
                 case Type._char: {
                     char v = conv.ToChar(val2);
                     Move.SetUInt8((byte) (val1 + v), ref _var);
@@ -100,9 +97,6 @@ namespace Rainbow.Execution.Math {
                     double v = conv.ToFloat64(val2);
                     Move.SetUInt16((ushort) (val1 + v), ref _var);
                     break;
-                }
-                case Type._string: {
-                    throw new InvalidTypeException("Cannot convert from string to uint8");
                 }
                 case Type._char: {
                     char v = conv.ToChar(val2);
@@ -169,9 +163,6 @@ namespace Rainbow.Execution.Math {
                     Move.SetUInt32((uint) (val1 + v), ref _var);
                     break;
                 }
-                case Type._string: {
-                    throw new InvalidTypeException("Cannot convert from string to uint8");
-                }
                 case Type._char: {
                     char v = conv.ToChar(val2);
                     Move.SetUInt32(val1 + v, ref _var);
@@ -236,9 +227,6 @@ namespace Rainbow.Execution.Math {
                     double v = conv.ToFloat64(val2);
                     Move.SetUInt64((ulong) (val1 + v), ref _var);
                     break;
-                }
-                case Type._string: {
-                    throw new InvalidTypeException("Cannot convert from string to uint8");
                 }
                 case Type._char: {
                     char v = conv.ToChar(val2);
@@ -305,9 +293,6 @@ namespace Rainbow.Execution.Math {
                     Move.SetInt8((sbyte) (val1 + v), ref _var);
                     break;
                 }
-                case Type._string: {
-                    throw new InvalidTypeException("Cannot convert from string to uint8");
-                }
                 case Type._char: {
                     char v = conv.ToChar(val2);
                     Move.SetInt8((sbyte) (val1 + v), ref _var);
@@ -372,9 +357,6 @@ namespace Rainbow.Execution.Math {
                     double v = conv.ToFloat64(val2);
                     Move.SetInt16((short) (val1 + v), ref _var);
                     break;
-                }
-                case Type._string: {
-                    throw new InvalidTypeException("Cannot convert from string to uint8");
                 }
                 case Type._char: {
                     char v = conv.ToChar(val2);
@@ -441,9 +423,6 @@ namespace Rainbow.Execution.Math {
                     Move.SetInt32((int) (val1 + v), ref _var);
                     break;
                 }
-                case Type._string: {
-                    throw new InvalidTypeException("Cannot convert from string to uint8");
-                }
                 case Type._char: {
                     char v = conv.ToChar(val2);
                     Move.SetInt32(val1 + v, ref _var);
@@ -508,9 +487,6 @@ namespace Rainbow.Execution.Math {
                     double v = conv.ToFloat64(val2);
                     Move.SetInt64((long) (val1 + v), ref _var);
                     break;
-                }
-                case Type._string: {
-                    throw new InvalidTypeException("Cannot convert from string to uint8");
                 }
                 case Type._char: {
                     char v = conv.ToChar(val2);
@@ -577,9 +553,6 @@ namespace Rainbow.Execution.Math {
                     Move.SetFloat16((half) ((float) val1 + v), ref _var);
                     break;
                 }
-                case Type._string: {
-                    throw new InvalidTypeException("Cannot convert from string to uint8");
-                }
                 case Type._char: {
                     char v = conv.ToChar(val2);
                     Move.SetFloat16((half) ((float) val1 + v), ref _var);
@@ -644,9 +617,6 @@ namespace Rainbow.Execution.Math {
                     double v = conv.ToFloat64(val2);
                     Move.SetFloat32((float) (val1 + v), ref _var);
                     break;
-                }
-                case Type._string: {
-                    throw new InvalidTypeException("Cannot convert from string to uint8");
                 }
                 case Type._char: {
                     char v = conv.ToChar(val2);
@@ -713,22 +683,12 @@ namespace Rainbow.Execution.Math {
                     Move.SetFloat64((double) (val1 + v), ref _var);
                     break;
                 }
-                case Type._string: {
-                    throw new InvalidTypeException("Cannot convert from string to uint8");
-                }
                 case Type._char: {
                     char v = conv.ToChar(val2);
                     Move.SetFloat64(val1 + v, ref _var);
                     break;
                 }
             }
-        }
-
-        public static void AddString(string val1, byte type2, byte[] val2, ref Instance _var) {
-            // TODO: string concatenation
-            //       i'm not doing this now because it requires allocating more memory
-            //       and moving pointers around because you cant change the length of a string
-            throw new UnsupportedException("String concatenation is not supported");
         }
     }
 }

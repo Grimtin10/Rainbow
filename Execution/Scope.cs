@@ -2,6 +2,7 @@
 using Rainbow.Execution.Math;
 using Rainbow.GarbageCollection.GCTypes;
 using Rainbow.Handlers;
+using System;
 using System.Diagnostics;
 using System.Text;
 
@@ -147,7 +148,7 @@ namespace Rainbow.Execution {
                         throw new NullRefException();
                     }
 
-                    Arithmetic.Add((byte) arg1.type, arg1.data.GetBytes(), type2, bytes2, ref var);
+                    Arithmetic.Add((byte) arg1.type[0], arg1.data.GetBytes(), type2, bytes2, ref var);
                     break;
                 }
                 case 0x04: {
@@ -178,7 +179,7 @@ namespace Rainbow.Execution {
                         throw new NullRefException();
                     }
 
-                    Arithmetic.Sub((byte) arg1.type, arg1.data.GetBytes(), type2, bytes2, ref var);
+                    Arithmetic.Sub((byte) arg1.type[0], arg1.data.GetBytes(), type2, bytes2, ref var);
                     break;
                 }
                 case 0x08: {
@@ -200,15 +201,16 @@ namespace Rainbow.Execution {
                     return true;
                 }
                 case 0x39: { // VALUE
-                    byte type = args[index++];
+                    Type[] type = GetType(args, ref index);
+
                     string name = GetSTR(args, ref index);
-                    byte[] bytes = GetBytes(args, type, ref index);
+                    byte[] bytes = GetBytes(args, (byte) type[0], ref index);
                     Block<byte> data = Globals.GarbageCollector.Alloc(bytes.Length);
                     data = Globals.GarbageCollector.stack.CopyTo(ref data);
                     for(int i = 0; i < bytes.Length; i++) {
                         data.SetPos(i, bytes[i]);
                     }
-                    variables.Add(name, new Instance(name, (Type) type, data));
+                    variables.Add(name, new Instance(name, type, data));
                     //Console.WriteLine(type.ToString("X2") + " " + name + " " + Encoding.UTF8.GetString(bytes));
                     break;
                 }
@@ -218,11 +220,12 @@ namespace Rainbow.Execution {
                     break;
                 }
                 case 0x3C: { // VARDEF
-                    byte type = args[index++];
+                    Type[] type = GetType(args, ref index);
+
                     string name = GetSTR(args, ref index);
-                    Block<byte> data = Globals.GarbageCollector.Alloc(GetTypeLength(type, args, index));
+                    Block<byte> data = Globals.GarbageCollector.Alloc(GetTypeLength((byte) type[0], args, index));
                     data = Globals.GarbageCollector.stack.CopyTo(ref data);
-                    variables.Add(name, new Instance(name, (Type) type, data));
+                    variables.Add(name, new Instance(name, type, data));
                     //Console.WriteLine(type.ToString("X2") + " " + name);
                     break;
                 }
@@ -245,6 +248,21 @@ namespace Rainbow.Execution {
             return ret;
         }
 
+        private Type[] GetType(byte[] args, ref int index) {
+            int count = 1;
+            int i2 = index;
+            while(args[i2++] == 0x0C) {
+                count++;
+            }
+
+            Type[] type = new Type[count];
+            for(int i = 0; i < count; i++, index++) {
+                type[index] = (Type) args[index];
+            }
+
+            return type;
+        }
+
         private void HandleSyscall(byte type, byte[] args, ref int index) {
             switch(type) {
                 case 0x00:
@@ -259,7 +277,7 @@ namespace Rainbow.Execution {
 
         private void HandleConout(ref Instance var) {
             byte[] bytes = var.data.GetBytes();
-            switch(var.type) {
+            switch(var.type[0]) {
                 case Type.uint8:
                     Console.WriteLine(conv.ToUInt8(bytes));
                     break;
@@ -293,8 +311,10 @@ namespace Rainbow.Execution {
                 case Type.float64:
                     Console.WriteLine(conv.ToFloat64(bytes));
                     break;
-                case Type._string:
-                    Console.WriteLine(var.data.ReadString());
+                case Type.pointer:
+                    if(var.type[1] == Type._char) {
+                        Console.WriteLine(var.data.ReadString());
+                    }
                     break;
                 case Type._char:
                     Console.WriteLine(conv.ToChar(bytes));
