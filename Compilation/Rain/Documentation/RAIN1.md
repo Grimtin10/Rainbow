@@ -4,7 +4,10 @@ Rain language mockups for version 1
 # Table Of Contents
 - [Top Level Statements](#top-level-statements)
 - [Pointers and Reference Types](#pointers-and-reference-types)
-- [Library Imports](#library-imports)
+- [Libraries](#libraries)
+- [Intrinsic Types and Methods](#intrinsic-types-and-methods)
+- [Overrides](#overrides)
+
 
 # Top Level Statements
 Top level statements incude [structs](#structs), [classes](#classes), [methods](#methods),
@@ -307,25 +310,172 @@ int main(params string[] args)
 ```
 
 ### Static Class Methods
+Unlike other languages that support OOP; Rain only
+supports static methods within classes. Mainly because
+not everything within Rain is a class. But upon usage
+of static classes, you will realize they behave in a
+different way than other class methods. Static methods
+are available from classes that have not been instanciated.
+They are also not available from instanciated objects.
+
+```cs
+class Foo
+{
+    static int Bar()
+    {
+        return 5;
+    }
+}
+```
+
+And here is what the usage looks like:
+
+```cs
+int x = Foo.Bar(); // x is set to 5
+
+Foo f = new Foo();
+int y = f.Bar(); // not allowed
+```
 
 ### Private Methods
+Private methods are methods that cant be accessed outside
+of a the class/struct or module definition they belong to. 
+Otherwise they behave exactly as they do in other languages:
 
-## IL
+```cs
+struct Foo
+{
+    int num { get; set; }
+
+    Foo(default);
+
+    int AddToNum(int toAdd)
+    {
+        return num + toAdd;
+    }
+
+    private int GetNum()
+    {
+        return num;
+    }
+}
+```
+
+Or in a module:
+
+```cs
+define myModule;
+
+private int GetInt()
+{
+    return 5;
+}
+```
+
+## IL (Intrinsic, see [Intrisic Types and Methods](#intrinsic-types-and-methods))
+The IL keyword behaves very similarly to the
+asm keyword in C. You can direcly put IL into
+this keyword. It can exist inside of functions
+and as a top level statement:
+
+```cs
+il {
+    SYSCALL CONOUT "Hello World!"
+}
+```
+
+The IL keyword is not only limited to IL! If your
+program AOT compiles you can use assembly!
+
+<span style="color: #eda539">**WARNING: THIS ASSEMBLY CODE MUST BE PLATFORM SPECIFIC! IT WILL MAKE YOUR PROGRAM LESS CROSS PLATFORM!**</span>
+
+```cs
+il(1)
+{
+    mov eax, 5
+    push eax
+}
+```
+
+If your program needs to JIT compile *and* AOT compile
+you can use * in the IL arguments:
+
+```cs
+il(*)
+{
+    SYSCALL CONOUT "Hello World!"
+}
+```
+
+This IL is casted to whatever platform your Rain is running
+on at compile time!
 
 # Pointers and Reference Types
+Rain supports pointers and reference types! However it behaves
+in an interesting way while dealing with them. It *does*
+interface with a garbage collector, but has a number of options
+on how you can define and manage reference types.
 
 ## Ref
+The most common pointer/reference type you will see in Rain is
+the ``ref`` keyword. This defines a reference type and has quite
+a bit of logic to it.
+
+```cs
+ref int x = ref 5;
+x = 6;
+
+// ref keywords are automatically dereferenced in Rain
+io.conout("{int}", x); // 6
+```
+
+Since refs are automatically dereferenced you always have
+to pass one with the ``ref`` keyword:
+
+```cs
+ref int x = ref 5;
+ref int y = ref x;
+```
 
 ### Fixed Refs
+Automatically dereferenced ``ref``s can get annoying! So Rain
+provides a fix in the form of ``fixed ref`` types. A ``fixed ref``
+is not automatically dereferenced and can just be passed around:
+
+```cs
+fixed ref int x = ref 5;
+int y = &5;
+```
+
+<span style="color: #43fa6e">**FUN FACT: Rains compiler doesnt know the difference between defining a class and defining a fixed ref!**</span>
 
 ### Unsafe Refs
+Unsafe ``ref``s are not tracked by the garbage collector and can
+be implicitely converted to and from [c pointers](#c-styled-pointers):
+
+```cs
+int *x = runtime.alloc(sizoef(int));
+unsafe ref int ptr = x;
+
+*x = 6;
+
+io.conout("{int}", ptr); // 6
+
+runtime.free(ptr); // you can also do runtime.free(x);
+```
 
 ## C Styled Pointers
 
-# Library Imports
+# Libraries
+
+## Imports
+
+### AOT Imports
+
+## Module Definitions
 
 # Intrinsic Types and Methods
 
-# Overrides
+## Runtime Variable
 
-# Runtime Variable
+# Overrides
