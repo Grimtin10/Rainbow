@@ -114,6 +114,72 @@ namespace Rainbow.Compilation.Assembler {
             byte[] res;
 
             switch(instr) {
+                case "ADD": {
+                    if(tokens[i + 1].type != TokenType.STR && tokens[i + 1].type != TokenType.VALUE) {
+                        throw new InvalidArgumentException($"Invalid argument type {tokens[i + 1].type} at token {i}");
+                    }
+                    if(tokens[i + 2].type != TokenType.STR && tokens[i + 2].type != TokenType.VALUE) {
+                        throw new InvalidArgumentException($"Invalid argument type {tokens[i + 2].type} at token {i}");
+                    }
+                    if(tokens[i + 3].type != TokenType.STR) {
+                        throw new InvalidArgumentException($"Invalid argument type {tokens[i + 3].type} at token {i}");
+                    }
+
+                    bool arg1 = GetArgType(tokens[i + 1]);
+                    bool arg2 = GetArgType(tokens[i + 2]);
+
+                    byte[] bytes1;
+                    byte[] bytes2;
+                    byte[] bytes3;
+
+                    bytes3 = StrToBytes(tokens[i + 3].value);
+
+                    if(!arg1 && !arg2) {
+                        bytes1 = StrToBytes(tokens[i + 1].value);
+                        bytes2 = StrToBytes(tokens[i + 2].value);
+
+                        res = new byte[bytes1.Length + bytes2.Length + bytes3.Length + 1];
+
+                        res[0] = 0x01;
+                    } else if(!arg1 && arg2) {
+                        bytes1 = StrToBytes(tokens[i + 1].value);
+                        bytes2 = ValToBytes(tokens[i + 2]);
+
+                        res = new byte[bytes1.Length + bytes2.Length + bytes3.Length + 1];
+
+                        res[0] = 0x02;
+
+                    } else if(arg1 && !arg2) {
+                        bytes1 = ValToBytes(tokens[i + 1]);
+                        bytes2 = StrToBytes(tokens[i + 2].value);
+
+                        res = new byte[bytes1.Length + bytes2.Length + bytes3.Length + 1];
+
+                        res[0] = 0x03;
+                    } else {
+                        bytes1 = ValToBytes(tokens[i + 1]);
+                        bytes2 = ValToBytes(tokens[i + 2]);
+
+                        res = new byte[bytes1.Length + bytes2.Length + bytes3.Length + 1];
+
+                        res[0] = 0x04;
+                    }
+
+                    int off = 1;
+                    for(int j = 0; j < bytes1.Length; j++, off++) {
+                        res[off] = bytes1[j];
+                    }
+                    for(int j = 0; j < bytes2.Length; j++, off++) {
+                        res[off] = bytes2[j];
+                    }
+                    for(int j = 0; j < bytes3.Length; j++, off++) {
+                        res[off] = bytes3[j];
+                    }
+
+                    i += 3;
+
+                    break;
+                }
                 case "SUB": {
                     if(tokens[i + 1].type != TokenType.STR && tokens[i + 1].type != TokenType.VALUE) {
                         throw new InvalidArgumentException($"Invalid argument type {tokens[i + 1].type} at token {i}");
@@ -149,7 +215,7 @@ namespace Rainbow.Compilation.Assembler {
 
                         res[0] = 0x06;
 
-                    } else if(arg1 && arg2) {
+                    } else if(arg1 && !arg2) {
                         bytes1 = ValToBytes(tokens[i + 1]);
                         bytes2 = StrToBytes(tokens[i + 2].value);
 
@@ -281,13 +347,12 @@ namespace Rainbow.Compilation.Assembler {
 
         private static byte[] StrToBytes(string str) {
             byte len = (byte)str.Length;
-            byte[] bytes = Encoding.UTF8.GetBytes(str);
 
             byte[] res = new byte[1 + len];
 
             res[0] = len;
-            for(int j = 0; j < bytes.Length; j++) {
-                res[j + 1] = bytes[j];
+            for(int j = 0; j < str.Length; j++) {
+                res[j + 1] = (byte) str[j];
             }
 
             return res;

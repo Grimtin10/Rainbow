@@ -2,6 +2,8 @@
 using Rainbow.Execution.Math;
 using Rainbow.GarbageCollection.GCTypes;
 using Rainbow.Handlers;
+using System;
+using System.Diagnostics;
 using System.Text;
 
 // TODO: split this into multiple files
@@ -86,11 +88,11 @@ namespace Rainbow.Execution {
             stackStart = Globals.GarbageCollector.stack.ptrs.Count;
 
             foreach(KeyValuePair<Instruction, byte[]> instruction in instructions) {
-                Console.Write(instruction.Key.ToString() + " ");
+                //Console.Write(instruction.Key.ToString() + " ");
                 foreach(byte b in instruction.Value) {
-                    Console.Write(b.ToString("X2") + " ");
+                    //Console.Write(b.ToString("X2") + " ");
                 }
-                Console.WriteLine();
+                //Console.WriteLine();
                 if(ExecInstruction(instruction)) {
                     // we returned, stop execution
                     Cleanup();
@@ -131,7 +133,24 @@ namespace Rainbow.Execution {
 
             int index = 0;
 
-            switch((byte)instr) {
+            switch((byte) instr) {
+                case 0x02: {
+                    Instance? arg1 = GetRef(GetSTR(args, ref index));
+                    if(arg1 == null) {
+                        throw new NullRefException();
+                    }
+
+                    byte type2 = args[index++];
+                    byte[] bytes2 = GetBytes(args, type2, ref index);
+
+                    Instance? var = GetRef(GetSTR(args, ref index));
+                    if(var == null) {
+                        throw new NullRefException();
+                    }
+
+                    Arithmetic.Add((byte) arg1.type[0], arg1.data.GetBytes(), type2, bytes2, ref var);
+                    break;
+                }
                 case 0x04: {
                     byte type1 = args[index++];
                     byte[] bytes1 = GetBytes(args, type1, ref index);
@@ -144,6 +163,23 @@ namespace Rainbow.Execution {
                     }
 
                     Arithmetic.Add(type1, bytes1, type2, bytes2, ref var);
+                    break;
+                }
+                case 0x06: {
+                    Instance? arg1 = GetRef(GetSTR(args, ref index));
+                    if(arg1 == null) {
+                        throw new NullRefException();
+                    }
+
+                    byte type2 = args[index++];
+                    byte[] bytes2 = GetBytes(args, type2, ref index);
+
+                    Instance? var = GetRef(GetSTR(args, ref index));
+                    if(var == null) {
+                        throw new NullRefException();
+                    }
+
+                    Arithmetic.Sub((byte) arg1.type[0], arg1.data.GetBytes(), type2, bytes2, ref var);
                     break;
                 }
                 case 0x08: {
@@ -165,16 +201,17 @@ namespace Rainbow.Execution {
                     return true;
                 }
                 case 0x39: { // VALUE
-                    byte type = args[index++];
+                    Type[] type = GetType(args, ref index);
+
                     string name = GetSTR(args, ref index);
-                    byte[] bytes = GetBytes(args, type, ref index);
+                    byte[] bytes = GetBytes(args, (byte) type[0], ref index);
                     Block<byte> data = Globals.GarbageCollector.Alloc(bytes.Length);
                     data = Globals.GarbageCollector.stack.CopyTo(ref data);
-                    for(int i=0;i<bytes.Length;i++) {
+                    for(int i = 0; i < bytes.Length; i++) {
                         data.SetPos(i, bytes[i]);
                     }
-                    variables.Add(name, new Instance(name, (Type) type, data));
-                    Console.WriteLine(type.ToString("X2") + " " + name + " " + Encoding.UTF8.GetString(bytes));
+                    variables.Add(name, new Instance(name, type, data));
+                    //Console.WriteLine(type.ToString("X2") + " " + name + " " + Encoding.UTF8.GetString(bytes));
                     break;
                 }
                 case 0x3B: { // SYSCALL_I
@@ -182,13 +219,14 @@ namespace Rainbow.Execution {
                     HandleSyscall(type, args, ref index);
                     break;
                 }
-                case 0x3C: {
-                    byte type = args[index++];
+                case 0x3C: { // VARDEF
+                    Type[] type = GetType(args, ref index);
+
                     string name = GetSTR(args, ref index);
-                    Block<byte> data = Globals.GarbageCollector.Alloc(GetTypeLength(type, args, index));
+                    Block<byte> data = Globals.GarbageCollector.Alloc(GetTypeLength((byte) type[0], args, index));
                     data = Globals.GarbageCollector.stack.CopyTo(ref data);
-                    variables.Add(name, new Instance(name, (Type) type, data));
-                    Console.WriteLine(type.ToString("X2") + " " + name);
+                    variables.Add(name, new Instance(name, type, data));
+                    //Console.WriteLine(type.ToString("X2") + " " + name);
                     break;
                 }
                 default:
@@ -199,6 +237,7 @@ namespace Rainbow.Execution {
         }
 
         public Instance? GetRef(string name) {
+            //Console.WriteLine(name);
             Instance? ret;
             if(!variables.TryGetValue(name, out ret)) {
                 if(parentScope != null) {
@@ -207,6 +246,21 @@ namespace Rainbow.Execution {
             }
 
             return ret;
+        }
+
+        private Type[] GetType(byte[] args, ref int index) {
+            int count = 1;
+            int i2 = index;
+            while(args[i2++] == 0x0C) {
+                count++;
+            }
+
+            Type[] type = new Type[count];
+            for(int i = 0; i < count; i++, index++) {
+                type[index] = (Type) args[index];
+            }
+
+            return type;
         }
 
         private void HandleSyscall(byte type, byte[] args, ref int index) {
@@ -223,7 +277,7 @@ namespace Rainbow.Execution {
 
         private void HandleConout(ref Instance var) {
             byte[] bytes = var.data.GetBytes();
-            switch(var.type) {
+            switch(var.type[0]) {
                 case Type.uint8:
                     Console.WriteLine(conv.ToUInt8(bytes));
                     break;
@@ -257,8 +311,10 @@ namespace Rainbow.Execution {
                 case Type.float64:
                     Console.WriteLine(conv.ToFloat64(bytes));
                     break;
-                case Type._string:
-                    Console.WriteLine(var.data.ReadString());
+                case Type.pointer:
+                    if(var.type[1] == Type._char) {
+                        Console.WriteLine(var.data.ReadString());
+                    }
                     break;
                 case Type._char:
                     Console.WriteLine(conv.ToChar(bytes));
@@ -279,6 +335,7 @@ namespace Rainbow.Execution {
         private string GetSTR(byte[] bytes, ref int index) {
             byte len = bytes[index++];
             string str = "";
+
             for(int i = 0; i < len; i++, index++) {
                 str += (char) bytes[index];
             }
@@ -644,7 +701,7 @@ namespace Rainbow.Execution {
                 }
             }
 
-            Console.WriteLine(i + " " + instr + " " + len);
+            //Console.WriteLine(i + " " + instr + " " + len);
 
             args = new byte[len];
 
@@ -657,7 +714,7 @@ namespace Rainbow.Execution {
 
         public void GetTypeLength(byte[] bytes, int i, ref byte len, ref int offset) {
             i += offset;
-            Console.Write("i: " + i + " ");
+            //Console.Write("i: " + i + " ");
             byte type = bytes[i++];
 
             len++;
@@ -678,7 +735,7 @@ namespace Rainbow.Execution {
                 default:
                     len += Types.lengths[type];
                     offset += Types.lengths[type];
-                    Console.WriteLine("type: " + type + " len: " + Types.lengths[type]);
+                    //Console.WriteLine("type: " + type + " len: " + Types.lengths[type]);
                     break;
             }
         }
@@ -706,12 +763,12 @@ namespace Rainbow.Execution {
 
         public byte GetRefLength(byte[] bytes, int i, ref byte len, ref int offset) {
             i += offset;
-            Console.Write("i: " + i + " " + bytes[i] + " ");
+            //Console.Write("i: " + i + " " + bytes[i] + " ");
             byte length = bytes[i];
             len += length;
             len++;
             offset += length + 1;
-            Console.WriteLine("r: " + length);
+            //Console.WriteLine("r: " + length);
 
             return length;
         }

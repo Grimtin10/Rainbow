@@ -117,9 +117,11 @@ public unsafe static class BlockExtensions {
     public static string ReadString(this Block<byte> blk) 
     {
         StringBuilder bld = new();
+
+        Block<Block<byte>> deref = blk.MarshalBlock<Block<byte>>();
         
         for(int i = 0; i < blk.length; i++) {
-            bld.Append((char) blk[i]);
+            bld.Append((char) deref[0][i]);
         }
 
         return bld.ToString();

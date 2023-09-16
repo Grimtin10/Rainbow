@@ -35,9 +35,6 @@
                 case Type.float64:
                     add.AddFloat64(conv.ToFloat64(val1), type2, val2, ref var);
                     break;
-                case Type._string:
-                    add.AddString(conv.ToString(val1), type2, val2, ref var);
-                    break;
                 case Type._char:
                     add.AddUInt8(conv.ToUInt8(val1), type2, val2, ref var);
                     break;
@@ -65,7 +62,6 @@
                     sub.SubInt16(conv.ToInt16(val1), type2, val2, ref var);
                     break;
                 case Type.int32:
-                    Console.WriteLine("val1 " + conv.ToInt32(val1));
                     sub.SubInt32(conv.ToInt32(val1), type2, val2, ref var);
                     break;
                 case Type.int64:
@@ -79,9 +75,6 @@
                     break;
                 case Type.float64:
                     sub.SubFloat64(conv.ToFloat64(val1), type2, val2, ref var);
-                    break;
-                case Type._string:
-                    sub.SubString(conv.ToString(val1), type2, val2, ref var);
                     break;
                 case Type._char:
                     sub.SubUInt8(conv.ToUInt8(val1), type2, val2, ref var);
