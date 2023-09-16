@@ -1,6 +1,7 @@
 ﻿using Rainbow.Compilation.Assembler;
 using Rainbow.Execution;
 using Newtonsoft.Json;
+using Rainbow.GarbageCollection.GCTypes;
 
 namespace Rainbow;
 
@@ -41,6 +42,6 @@ class Program {
 
                 File.WriteAllText("./exampleconfig.json", JsonConvert.SerializeObject(new RuntimeConfig(true, new AssemblerArgs(linkerArgs))));
             }
-        }
+        } 
     }
 }
