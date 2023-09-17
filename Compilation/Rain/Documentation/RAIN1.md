@@ -580,7 +580,7 @@ to be able to interop with those 2 languages.
 
 ## WebAssembly
 Through LLVM Rain will eventually support compilation
-to WebAssembly. While this feature is not supported yet
+to WebAssembly. While this feature is not supported yet,
 [yendy](https://github.com/YendisFish) aims to provide
 support for this feature by the first LTS release.
 
