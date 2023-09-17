@@ -17,6 +17,7 @@ Rain language mockups for version 1
 - [Libraries](#libraries)
   - [AOT Imports](#aot-imports)
   - [C# and Java Interop](#c-and-java-interop)
+  - [WebAssembly](#webassembly)
   - [Module Definitions](#module-definitions)
 - [Intrinsic Types and Methods](#intrinsic-types-and-methods)
   - [Sizeof](#sizeof)
