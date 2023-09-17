@@ -9,6 +9,14 @@ Rain language mockups for version 1
   - [Constructors](#constructors)
     - [Default Keyword](#default-keyword)
     - [Intrinsic this.fields Property](#intrisic-thisfields-property)
+  - [Struct and Class Getters/Setters](#structclass-getterssetters)
+    - [Immutable Types Using Getters/Setters](#immutable-types-using-getterssetters)
+    - [Hiding Immutability](#hiding-immutability-string-example)
+  - [Templates](#templates)
+  - [Methods](#methods)
+    - [Static Class Methods](#static-class-methods)
+    - [Private Methods](#private-methods)
+- [IL](#il-intrinsic-see-intrisic-types-and-methods)
 - [Pointers and Reference Types](#pointers-and-reference-types)
   - [Ref](#ref)
     - [Fixed Refs](#fixed-refs)
@@ -22,6 +30,7 @@ Rain language mockups for version 1
 - [Intrinsic Types and Methods](#intrinsic-types-and-methods)
   - [Sizeof](#sizeof)
   - [Runtime Variable](#runtime-variable)
+  - [Intrinsic Overrides](#intrinsic-overrides)
 - [Overrides](#overrides)
 
 
@@ -484,7 +493,7 @@ is not automatically dereferenced and can just be passed around:
 
 ```cs
 fixed ref int x = ref 5;
-int y = &5;
+int y = *5;
 ```
 
 <span style="color: #43fa6e">**FUN FACT: Rains compiler doesnt know the difference between defining a class and defining a fixed ref!**</span>
@@ -593,9 +602,52 @@ int Add(int a, int b)
 ```
 
 # Intrinsic Types and Methods
+Intrinsic types and met hods are those which are filled by
+Rains compiler at compile time. These include special variables
+like the [runtime variable](#runtime-variable) and [ref](#ref)
+keyword.
 
-## Sizeof
+## Sizeof [Method]
+The sizeof method is an intrinsic method that returns the size
+of a given type in bytes. This number is resolved at compile time 
+instead of at runtime.
 
-## Runtime Variable
+```cs
+int charSize = sizeof(char);
+```
+
+## Runtime [Variable]
+The runtime variable is an intrisic object that allows access to certain
+runtime functions. This variable is an extremely special type because it
+behaves like a global variable. It is accessible throughout the entirety
+of your code.
+
+```cs
+unsafe ref byte buffer = runtime.alloc(10); // 10 byte buffer
+```
+
+## Intrinsic Overrides
+[yendy](https://github.com/YendisFish) aims to provide overrides for
+certain intrinsic functions and methods by the first LTS release.
 
 # Overrides
+Rain provides overrides to functions from inherited classes
+and templates. Writing an override function is easy:
+
+```cpp
+template CustomTemplate
+{
+    int GetInt()
+    {
+        return 5;
+    }
+}
+
+class CustomClass : CustomTemplate
+{
+    int GetInt() ! base.GetInt()
+    {
+        return 10;
+    }
+}
+```
