@@ -1,6 +1,4 @@
-﻿using Rainbow.Exceptions;
-
-namespace Rainbow.Execution {
+﻿namespace Rainbow.Execution {
     // this is literally implicit type conversion
     // TODO: all this shit is untested pls test
     internal class Move {

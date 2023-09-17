@@ -1,8 +1,8 @@
 ﻿using Rainbow.Exceptions;
-using System;
-using System.ComponentModel;
+using Rainbow.Execution;
 using System.Diagnostics;
 using System.Text;
+using Type = Rainbow.Execution.Type;
 
 namespace Rainbow.Compilation.Assembler {
     public class Assembler {
@@ -16,33 +16,63 @@ namespace Rainbow.Compilation.Assembler {
 
             List<Token> tokens = Lexer.Lex(asm);
 
+            Dictionary<string, FuncDef> funcs = new();
+
             bool inFuncDef = false;
             string funcName = ""; // for error purposes
             int funcOffset = 0;
             uint byteCount = 0;
+
+            for(int i = 0; i < tokens.Count; i++) {
+                if(inFuncDef) {
+                    if(tokens[i].type == TokenType.STR) {
+                        if(funcName.Length == 0) {
+                            funcName = tokens[i].value;
+                            funcs.Add(funcName, new FuncDef(funcName));
+                            Console.WriteLine($"Found function {funcName}");
+                        }
+                    }
+
+                    if(tokens[i].type == TokenType.TYPE) {
+                        if(tokens[i].type == TokenType.TYPE && tokens[i].value == "*") {
+                            continue; // TODO: pointer types
+                        }
+                        // lol
+                        funcs.Values.ToList()[^1].AddArg((Type) Lexer.types[tokens[i].value]);
+                    }
+                }
+
+                if(tokens[i].type == TokenType.TYPE) {
+                    if(tokens[i + 2].type == TokenType.LPAREN) {
+                        inFuncDef = true;
+                        funcName = "";
+                    }
+                }
+
+                if(tokens[i].type == TokenType.LBRACKET) {
+                    inFuncDef = false;
+                }
+            }
+
+            inFuncDef = false;
+
             for(int i = 0; i < tokens.Count; i++) {
                 if(tokens[i].type == TokenType.TYPE) {
                     if(tokens[i + 2].type == TokenType.LPAREN) {
                         output.Add(0xFF);
                         inFuncDef = true;
+                        funcName = "";
+                        funcOffset = output.Count;
                     }
                 }
 
                 if(tokens[i].type == TokenType.RPAREN && inFuncDef) {
-                    for(int j = i; j < tokens.Count; j++) {
-                        if(tokens[j].type == TokenType.RBRACKET) {
-                            inFuncDef = false;
-                        }
-                    }
-
-                    if(inFuncDef) {
-                        throw new UnfinishedFuncException($"Function {funcName} never closes!");
-                    } else {
-                        funcOffset = (int) byteCount + 1;
-                        byteCount = 0;
-                        for(int j = 0; j < 4; j++) {
-                            output.Add(0x00); // temp values
-                        }
+                    output.Add(0xFA);
+                    byteCount++;
+                    funcOffset = output.Count;
+                    byteCount = 0;
+                    for(int j = 0; j < 4; j++) {
+                        output.Add(0x00); // temp values
                     }
                 }
 
@@ -53,7 +83,7 @@ namespace Rainbow.Compilation.Assembler {
                         break;
                     }
                     case TokenType.STR: {
-                        if(inFuncDef) {
+                        if(inFuncDef && funcName.Length == 0) {
                             funcName = tokens[i].value;
                         }
 
@@ -73,7 +103,7 @@ namespace Rainbow.Compilation.Assembler {
                         break;
                     }
                     case TokenType.INSTR: {
-                        byte[] instr = ParseInstr(tokens, ref i);
+                        byte[] instr = ParseInstr(tokens, funcs, ref i);
                         foreach(byte b in instr) {
                             output.Add(b);
                         }
@@ -109,7 +139,7 @@ namespace Rainbow.Compilation.Assembler {
             return output.ToArray();
         }
 
-        private static byte[] ParseInstr(List<Token> tokens, ref int i) {
+        private static byte[] ParseInstr(List<Token> tokens, Dictionary<string, FuncDef> funcs, ref int i) {
             string instr = tokens[i].value;
             byte[] res;
 
@@ -276,6 +306,26 @@ namespace Rainbow.Compilation.Assembler {
 
                     break;
                 }
+                case "CALL": {
+                    if(tokens[i + 1].type != TokenType.STR) {
+                        throw new InvalidArgumentException($"Invalid argument type {tokens[i + 1].type} at token {i}");
+                    }
+
+                    byte[] bytes1;
+
+                    bytes1 = StrToBytes(tokens[i + 1].value);
+
+                    res = new byte[bytes1.Length + 1];
+                    res[0] = 0x2D;
+
+                    int off = 1;
+                    for(int j = 0; j < bytes1.Length; j++, off++) {
+                        res[off] = bytes1[j];
+                    }
+
+                    i++;
+                    break;
+                }
                 case "RET": {
                     if(tokens[i + 1].type != TokenType.STR && tokens[i + 1].type != TokenType.VALUE) {
                         res = new byte[] { 0x2F, 0x00 };
@@ -330,7 +380,7 @@ namespace Rainbow.Compilation.Assembler {
 
                     break;
                 }
-                case "SYSCALL": {
+                case "SYSCALL": { // TODO: deprecated
                     bool arg1 = GetArgType(tokens[i + 1]);
                     byte[] bytes1;
                     byte[] bytes2;

@@ -1,7 +1,6 @@
 ﻿using Rainbow.Compilation.Assembler;
 using Rainbow.Execution;
 using Newtonsoft.Json;
-using Rainbow.GarbageCollection.GCTypes;
 
 namespace Rainbow;
 

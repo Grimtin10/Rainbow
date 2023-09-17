@@ -1,6 +1,4 @@
-﻿using Rainbow.Exceptions;
-
-namespace Rainbow.Execution.Math {
+﻿namespace Rainbow.Execution.Math {
     // i heard you like type conversions so i put some type conversions in your type conversions
     internal class Addition {
         // TODO FIXME PLEASE HELP GOD: theres gotta be a better way

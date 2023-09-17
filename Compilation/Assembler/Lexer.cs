@@ -1,4 +1,7 @@
-﻿namespace Rainbow.Compilation.Assembler {
+﻿using Rainbow.Execution;
+using Type = Rainbow.Execution.Type;
+
+namespace Rainbow.Compilation.Assembler {
     internal class Lexer {
         public static List<Token> Lex(string[] input) {
             List<Token> tokens = new();
@@ -36,9 +39,11 @@
                         case ')':
                             if(curString.Trim().Length > 0) {
                                 tokens.Add(TokenizeString(curString.Trim()));
+                            }
 
-                                curString = "" + line[j];
+                            curString = "" + line[j];
 
+                            if(curString.Trim().Length > 0) {
                                 tokens.Add(TokenizeString(curString.Trim()));
 
                                 curString = "";
@@ -94,11 +99,10 @@
             { "float16", 0x08 },
             { "float32", 0x09 },
             { "float64", 0x0A },
-            { "string",  0x0B },
-            { "object",  0x0C },
-            { "char",    0x0D },
-            { "*",       0x0E },
-            { "void",    0x0F },
+            { "char",    0x0B },
+            { "*",       0x0C },
+            { "struct",  0x0D },
+            { "void",    0x0E },
         };
 
         public static Dictionary<string, byte> syscalls = new() {

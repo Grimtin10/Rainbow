@@ -3,8 +3,6 @@ using Rainbow.Execution.Math;
 using Rainbow.GarbageCollection.GCTypes;
 using Rainbow.Handlers;
 using Rainbow.Marshalling;
-using System;
-using System.Diagnostics;
 using System.Text;
 
 // TODO: split this into multiple files
@@ -22,14 +20,16 @@ namespace Rainbow.Execution {
 
         public bool isGlobal = false;
 
+        // TODO: implement the scope length fix
         public Scope(byte[] bytes, Scope? parentScope) {
             this.parentScope = parentScope;
 
             bool inFunction = false;
+            bool inArgs = false;
 
             string funcName = "";
             Type funcType = Type.undefined;
-            List<Instance> arguments = new();
+            List<Type[]> arguments = new();
 
             int scopeDepth = 0;
             List<byte> scopeBytes = new();
@@ -37,6 +37,7 @@ namespace Rainbow.Execution {
             for(int i = 0; i < bytes.Length; i++) {
                 if(bytes[i] == 0xFF && scopeDepth == 0) {
                     inFunction = true;
+                    inArgs = true;
                     funcName = "";
                     funcType = Type.undefined;
                     arguments = new();
@@ -44,6 +45,9 @@ namespace Rainbow.Execution {
                 }
 
                 if(bytes[i] == 0xFE) {
+                    if(inArgs) {
+                        throw new UnfinishedFuncException($"Arguments for function {funcName} never finish!");
+                    }
                     scopeDepth++;
                     continue;
                 }
@@ -61,6 +65,12 @@ namespace Rainbow.Execution {
                     continue;
                 }
 
+                if(bytes[i] == 0xFA) {
+                    inArgs = false;
+                }
+
+                //Console.WriteLine(string.Format("{0:X2} ", bytes[i]));
+
                 if(scopeDepth > 0) {
                     scopeBytes.Add(bytes[i]);
                 } else {
@@ -77,6 +87,30 @@ namespace Rainbow.Execution {
                             }
 
                             funcName = new string(str);
+                            i--;
+                        } else if(inArgs) {
+                            int index = i;
+                            while(bytes[index] == 0x0C) {
+                                index++;
+                            }
+
+                            int count = index - i + 1;
+                            Type[] type = new Type[count];
+                            for(int j = 0; j < count; j++, i++) {
+                                type[j] = (Type) bytes[i];
+                            }
+
+                            byte length = bytes[i];
+                            char[] str = new char[length];
+                            i++;
+
+                            for(int j = 0; j < length && i < bytes.Length; j++, i++) {
+                                str[j] = (char) bytes[i];
+                            }
+
+                            Console.WriteLine(new string(str));
+
+                            i--;
                         }
                     } else {
                         instructions.Add(ParseInstruction(bytes, ref i));
@@ -86,6 +120,14 @@ namespace Rainbow.Execution {
         }
 
         public void Execute() {
+            if(parentScope != null) {
+                foreach(KeyValuePair<string, Function> func in parentScope.functions) {
+                    if(!functions.ContainsKey(func.Key)) {
+                        functions.Add(func.Key, func.Value);
+                    }
+                }
+            }
+
             stackStart = Globals.GarbageCollector.stack.ptrs.Count;
 
             for(int i=0; i<instructions.Count;i++) {
@@ -265,6 +307,12 @@ namespace Rainbow.Execution {
                     }
 
                     return Converter.ToInt32(bytes);
+                }
+                case 0x2D: { // TODO: argument handling
+                    string name = GetSTR(args, ref index);
+
+                    functions[name].Execute();
+                    break;
                 }
                 case 0x2F: {
                     // TODO: actually get return value
@@ -677,7 +725,7 @@ namespace Rainbow.Execution {
                     GetTypeLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
                     break;
-                case 0x2D:
+                case 0x2D: // it's complicated
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x2E:
@@ -784,23 +832,14 @@ namespace Rainbow.Execution {
 
         public void GetTypeLength(byte[] bytes, int i, ref byte len, ref int offset) {
             i += offset;
-            //Console.Write("i: " + i + " ");
+
             byte type = bytes[i++];
 
             len++;
             offset++;
 
             switch(type) {
-                case 0x0B:
-                    i++;
-                    offset++;
-                    while(bytes[i] != 0) {
-                        len++;
-                        i++;
-                        offset++;
-                    }
-                    break;
-                case 0x0C:
+                case 0x0D:
                     break; // TODO(grimtin10): object specification
                 default:
                     len += Types.lengths[type];

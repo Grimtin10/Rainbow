@@ -4,7 +4,12 @@ VARDEF int32 $res2
 SUB 1, 0, $res
 SYSCALL CONOUT $res
 
-uint32 main(string* args) {
+uint32 main(char args) {
+	CALL doStuff
+	RET 0
+}
+
+void doStuff() {
 	SUB 0, $res, $res2
 	SUB $res2, $res, $res
 	SYSCALL CONOUT $res
