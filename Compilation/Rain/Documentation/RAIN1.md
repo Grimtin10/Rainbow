@@ -1,4 +1,4 @@
-# Rain (1.0 [Experimental])
+# Rain 1.0 [Experimental]
 Rain language mockups for version 1
 
 # Table Of Contents
@@ -15,8 +15,8 @@ Rain language mockups for version 1
     - [Unsafe Refs](#unsafe-refs)
   - [C Style Pointers](#c-styled-pointers)
 - [Libraries](#libraries)
-  - [Imports](#imports)
-    - [AOT Imports](#aot-imports)
+  - [AOT Imports](#aot-imports)
+  - [C# and Java Interop](#c-and-java-interop)
   - [Module Definitions](#module-definitions)
 - [Intrinsic Types and Methods](#intrinsic-types-and-methods)
   - [Sizeof](#sizeof)
@@ -78,6 +78,12 @@ class Car
 {
     string make { get; set; }
     string model { get; set; }
+
+    Car(string make, string model)
+    {
+        this.make = make;
+        this.model = model;
+    }
 }
 ```
 
@@ -325,10 +331,10 @@ int main(params string[] args)
 ```
 
 ### Static Class Methods
-Unlike other languages that support OOP; Rain only
-supports static methods within classes. Mainly because
+Unlike other languages that support OOP; Rain supports static
+methods only within classes. This is mainly because
 not everything within Rain is a class. But upon usage
-of static classes, you will realize they behave in a
+of static methods, you will realize they behave in a
 different way than other class methods. Static methods
 are available from classes that have not been instanciated.
 They are also not available from instanciated objects.
@@ -405,8 +411,7 @@ program AOT compiles you can use assembly!
 <span style="color: #eda539">**WARNING: THIS ASSEMBLY CODE MUST BE PLATFORM SPECIFIC! IT WILL MAKE YOUR PROGRAM LESS CROSS PLATFORM!**</span>
 
 ```cs
-il(1)
-{
+il(1) {
     mov eax, 5
     push eax
 }
@@ -416,8 +421,7 @@ If your program needs to JIT compile *and* AOT compile
 you can use * in the IL arguments:
 
 ```cs
-il(*)
-{
+il(*) {
     SYSCALL CONOUT "Hello World!"
 }
 ```
@@ -513,12 +517,79 @@ runtime.free(str);
 ```
 
 # Libraries
+Libraries are an interesting aspect of Rain. This is mainly due to the fact
+that Rainbow is castable to multiple different platforms. But the first aspect
+of libraries is their conventions.
 
-## Imports
+Libraries in Rain are imported through defined modules. For example:
 
-### AOT Imports
+[mylib.rn](#module-definitions)
+```cs
+define mylib;
+
+int Add(int a, int b)
+{
+    return a + b;
+}
+```
+
+myprogram.rn
+```cs
+include mylib;
+
+int main()
+{
+    int sum = Add(5, 5);
+}
+```
+
+## AOT Imports
+With Rainbows support for AOT compilation, linking native binaries is just as easy
+as importing Rain modules:
+
+mylib.c
+```c
+int Add(int a, int b) {
+    return a + b;
+}
+```
+
+```cs
+include "./mylib.dll";
+
+int main()
+{
+    int sum = Add();
+}
+```
+
+## C# and Java Interop
+Rainbow eventually aims to be able to compile to
+run on the CLR and JVM. With that, Rain also aims
+to be able to interop with those 2 languages.
+
+## WebAssembly
+Through LLVM Rain will eventually support compilation
+to WebAssembly. While this feature is not supported yet
+[yendy](https://github.com/YendisFish) aims to provide
+support for this feature by the first LTS release.
 
 ## Module Definitions
+Module definitions in Rain are quite straightforward and
+easy. They are similar to namespace in C#, except you
+use the define keyword. The naming convensions are quite
+simple for modules to. Simply put the name of your library
+in them:
+
+mylib.rn
+```cs
+define mylib;
+
+int Add(int a, int b)
+{
+    return a + b;
+}
+```
 
 # Intrinsic Types and Methods
 
