@@ -22,6 +22,8 @@ Rain language mockups for version 1
     - [Fixed Refs](#fixed-refs)
     - [Unsafe Refs](#unsafe-refs)
   - [C Style Pointers](#c-styled-pointers)
+- [Stack Buffers](#stack-buffers)
+  - [Fixed Stack Refs](#fixed-stack-refs)
 - [Libraries](#libraries)
   - [AOT Imports](#aot-imports)
   - [C# and Java Interop](#c-and-java-interop)
@@ -32,6 +34,7 @@ Rain language mockups for version 1
   - [Runtime Variable](#runtime-variable)
   - [Intrinsic Overrides](#intrinsic-overrides)
 - [Overrides](#overrides)
+  - [Override Aliases](#override-aliases)
 
 
 # Top Level Statements
@@ -466,14 +469,8 @@ ref int x = ref 5;
 ref int y = ref x;
 ```
 
-The ``ref`` keyword can also be used to allocate a block of a type
-on the heap by allocating an array:
-
-```cs
-ref byte[] buff = ref new byte[100];
-```
-
-But you can allocate an array of refs on the stack by doing this:
+As an [intrinsic type](#intrinsic-types-and-methods), ref is able
+to be initialized as an array.
 
 ```cs
 ref[] byte bytePtrs = new ref byte[5];
@@ -493,7 +490,7 @@ is not automatically dereferenced and can just be passed around:
 
 ```cs
 fixed ref int x = ref 5;
-int y = *5;
+int y = *x; // 5
 ```
 
 <span style="color: #43fa6e">**FUN FACT: Rains compiler doesnt know the difference between defining a class and defining a fixed ref!**</span>
@@ -513,17 +510,47 @@ io.conout("{int}", ptr); // 6
 runtime.free(ptr); // you can also do runtime.free(x);
 ```
 
+Unsafe refs also act as an unsafe buffer:
+
+```cs
+unsafe ref byte ptr = runtime.alloc(sizeof(byte) * 100);
+byte x = ptr[1];
+```
+
 ## C Styled Pointers
 Rain supports C styled pointers and provides allocations methods
 to interact with them through the [runtime variable](#runtime-variable)
 
 ```cs
 char *str = runtime.alloc(sizeof(char) * 3);
-*str = "Hi!"; // "" returns a char[], however, the compiler and rain both do not know the difference between the 2
+*str = "Hi!"; // "" returns a char[], however, the compiler does not know the difference between the 2
 
 io.conout(str);
 
 runtime.free(str);
+```
+
+# Stack Buffers
+In Rain arrays are by default allocated on the heap. However, there
+is a way to also allocate fixed buffers on the stack:
+
+```cs
+fixed byte buff[100];
+```
+Fixed buffers can only be assigned to when initialized. However, the
+elements within them are gettable *and* settable.
+
+## Fixed Stack Refs
+In the unlikely case that you want to take a pointer to a
+stack buffer, there is support for such a task:
+
+```cs
+fixed byte buff[100];
+unsafe ref byte ptr = ref buff;
+
+ptr[0] = 0x1F;
+
+io.conout("{byte}", buff[0]); // 0x1F
 ```
 
 # Libraries
@@ -651,3 +678,30 @@ class CustomClass : CustomTemplate
     }
 }
 ```
+
+## Override Aliases
+Overrides support adding function aliases in base
+classes. This makes it easier to write overrides for
+things like operators.
+
+```c++
+template MyTemplate
+{
+    int +(int a, int b) ? MyTemplate.Add()
+    {
+        return a + b;
+    }
+}
+
+class MyClass : MyTemplate
+{
+    int +(int a, int b) ! base.Add()
+    {
+        return a + b + 1;
+    }
+}
+```
+
+This functionality is only recommended for usage
+on operators. Please use the ``base`` keyword to
+get around ambiguity problems.

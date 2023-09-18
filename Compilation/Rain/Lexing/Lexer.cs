@@ -23,8 +23,18 @@ public class Lexer
                 {
                     if(current.Length > 0)
                     {
+                        decimal dnumeric;
                         long numeric;
                         if(long.TryParse(current, out numeric))
+                        {
+                            tokens.Add(new Token(current, TokenType.NUMERIC, new string[0]));
+
+                            current = "";
+
+                            break;
+                        }
+
+                        if(decimal.TryParse(current, out dnumeric))
                         {
                             tokens.Add(new Token(current, TokenType.NUMERIC, new string[0]));
 
@@ -44,8 +54,18 @@ public class Lexer
                 {
                     if(current.Length > 0)
                     {
+                        decimal dnumeric;
                         long numeric;
                         if(long.TryParse(current, out numeric))
+                        {
+                            tokens.Add(new Token(current, TokenType.NUMERIC, new string[0]));
+
+                            current = "";
+
+                            break;
+                        }
+
+                        if(decimal.TryParse(current, out dnumeric))
                         {
                             tokens.Add(new Token(current, TokenType.NUMERIC, new string[0]));
 
@@ -67,8 +87,18 @@ public class Lexer
                 {
                     if(current.Length > 0)
                     {
+                        decimal dnumeric;
                         long numeric;
                         if(long.TryParse(current, out numeric))
+                        {
+                            tokens.Add(new Token(current, TokenType.NUMERIC, new string[0]));
+
+                            current = "";
+
+                            break;
+                        }
+
+                        if(decimal.TryParse(current, out dnumeric))
                         {
                             tokens.Add(new Token(current, TokenType.NUMERIC, new string[0]));
 
