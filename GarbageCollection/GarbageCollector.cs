@@ -4,6 +4,13 @@ using System.Runtime.InteropServices;
 
 namespace Rainbow.GarbageCollection;
 
+/*
+    Shortly deprecating the reference counting
+    garbage collector! Reason being that it is
+    incredibly expensive on time. Implementing
+    a similar technique alongside generational
+    collection will be the next feature.
+*/
 public unsafe class GarbageCollector
 {
     public StackBlock stack { get; set; } = new(); //TODO : FreeStack(int index); FreeAllStacks();

@@ -1,6 +1,7 @@
 ﻿using Rainbow.Compilation.Assembler;
 using Rainbow.Execution;
 using Newtonsoft.Json;
+using Rainbow.GarbageCollection.GC2;
 
 namespace Rainbow;
 
@@ -34,25 +35,8 @@ class Program
 
     public unsafe static void Nightly(string[] args)
     {
-        RuntimeConfig? conf;
-        for (int i = 0; i < args.Length; i++)
-        {
-            if (args[i] == "--conf")
-            {
-                conf = JsonConvert.DeserializeObject<RuntimeConfig>(File.ReadAllText(args[i] + 1));
-                //RunConfigSetup();
-            }
-
-            if (args[i] == "--write-conf")
-            {
-                List<LinkerArgs> linkerArgs = new();
-                linkerArgs.Add(new LinkerArgs("MyCoolLib.dll"));
-                linkerArgs.Add(new LinkerArgs("MyAwesomeLib.so"));
-                linkerArgs.Add(new LinkerArgs("MyFantasticLib.rbb", true));
-
-                File.WriteAllText("./exampleconfig.json", JsonConvert.SerializeObject(new RuntimeConfig(true, new AssemblerArgs(linkerArgs))));
-            }
-        }
+        IBlock<byte> x = new Rainbow.GarbageCollection.GC2.Struct();
+        Console.WriteLine(x is Rainbow.GarbageCollection.GC2.Struct);
     }
 
     public static void Build(string path)

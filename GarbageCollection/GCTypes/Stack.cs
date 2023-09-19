@@ -15,7 +15,7 @@ public unsafe struct StackBlock
     }
 
     public Block<byte> Push(ref Block<byte> ptr)
-    { 
+    {
         Block<byte> bt = StackAlloc<byte>(ptr.isref, ptr.length);
 
         for(int i = 0; i < bt.length; i++)
