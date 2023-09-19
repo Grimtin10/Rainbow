@@ -68,8 +68,6 @@ namespace Rainbow.Compilation.Assembler {
         private static Token TokenizeString(string input) {
             if(types.ContainsKey(input)) {
                 return new Token(TokenType.TYPE, input);
-            } else if(syscalls.ContainsKey(input)) {
-                return new Token(TokenType.SYSCALL, input);
             } else if(instructions.Contains(input)) {
                 return new Token(TokenType.INSTR, input);
             } else if(int.TryParse(input, out _) || long.TryParse(input, out _) || float.TryParse(input, out _) || double.TryParse(input, out _)) {
@@ -103,11 +101,6 @@ namespace Rainbow.Compilation.Assembler {
             { "*",       0x0C },
             { "struct",  0x0D },
             { "void",    0x0E },
-        };
-
-        public static Dictionary<string, byte> syscalls = new() {
-            { "CONOUT", 0x00 },
-            { "READFILE", 0x01 },
         };
 
         public static List<string> instructions = new() {

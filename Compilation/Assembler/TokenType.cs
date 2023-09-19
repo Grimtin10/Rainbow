@@ -8,6 +8,6 @@
         RBRACKET,
         LPAREN,
         RPAREN,
-        SYSCALL,
+        CMP,
     }
 }

@@ -68,7 +68,7 @@ public unsafe struct StackBlock
         return obj.MarshalBlock<T>();
     }
 
-    public void Pop()
+    public Block<byte> Pop()
     {
         for(int i = 0; i < currentBlockSize; i++)
         {
@@ -77,9 +77,12 @@ public unsafe struct StackBlock
 
         pos = pos - (ptrs[ptrs.Count - 1].Value.length * sizeof(byte));
 
+        Block<byte> ret = ptrs[^1].Value;
         ptrs.RemoveAt(ptrs.Count - 1);
 
         Console.WriteLine("Popping value off of stack.");
+
+        return ret;
     }
 
     public Block<byte> CopyTo(ref Block<byte> tocopy)

@@ -18,7 +18,6 @@
         
         // TODO: argument support
         public void Execute() {
-            Console.WriteLine("executing " + name);
             scope.Execute();
         }
     }
