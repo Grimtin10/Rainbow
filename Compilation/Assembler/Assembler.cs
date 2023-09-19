@@ -29,7 +29,6 @@ namespace Rainbow.Compilation.Assembler {
                         if(funcName.Length == 0) {
                             funcName = tokens[i].value;
                             funcs.Add(funcName, new FuncDef(funcName));
-                            Console.WriteLine($"Found function {funcName}");
                         }
                     }
 
@@ -95,11 +94,6 @@ namespace Rainbow.Compilation.Assembler {
                             output.Add(b);
                         }
                         byteCount += (uint) str.Length + 1;
-                        break;
-                    }
-                    case TokenType.SYSCALL: {
-                        output.Add(Lexer.syscalls[tokens[i].value]);
-                        byteCount++;
                         break;
                     }
                     case TokenType.INSTR: {
@@ -171,17 +165,17 @@ namespace Rainbow.Compilation.Assembler {
                         res = new byte[bytes1.Length + bytes2.Length + bytes3.Length + 1];
 
                         res[0] = 0x01;
-                    } else if(!arg1 && arg2) {
-                        bytes1 = StrToBytes(tokens[i + 1].value);
-                        bytes2 = ValToBytes(tokens[i + 2]);
+                    } else if(arg1 && !arg2) {
+                        bytes1 = ValToBytes(tokens[i + 1]);
+                        bytes2 = StrToBytes(tokens[i + 2].value);
 
                         res = new byte[bytes1.Length + bytes2.Length + bytes3.Length + 1];
 
                         res[0] = 0x02;
 
-                    } else if(arg1 && !arg2) {
-                        bytes1 = ValToBytes(tokens[i + 1]);
-                        bytes2 = StrToBytes(tokens[i + 2].value);
+                    } else if(!arg1 && arg2) {
+                        bytes1 = StrToBytes(tokens[i + 1].value);
+                        bytes2 = ValToBytes(tokens[i + 2]);
 
                         res = new byte[bytes1.Length + bytes2.Length + bytes3.Length + 1];
 
@@ -237,17 +231,17 @@ namespace Rainbow.Compilation.Assembler {
                         res = new byte[bytes1.Length + bytes2.Length + bytes3.Length + 1];
 
                         res[0] = 0x05;
-                    } else if(!arg1 && arg2) {
-                        bytes1 = StrToBytes(tokens[i + 1].value);
-                        bytes2 = ValToBytes(tokens[i + 2]);
+                    } else if(arg1 && !arg2) {
+                        bytes1 = ValToBytes(tokens[i + 1]);
+                        bytes2 = StrToBytes(tokens[i + 2].value);
 
                         res = new byte[bytes1.Length + bytes2.Length + bytes3.Length + 1];
 
                         res[0] = 0x06;
 
-                    } else if(arg1 && !arg2) {
-                        bytes1 = ValToBytes(tokens[i + 1]);
-                        bytes2 = StrToBytes(tokens[i + 2].value);
+                    } else if(!arg1 && arg2) {
+                        bytes1 = StrToBytes(tokens[i + 1].value);
+                        bytes2 = ValToBytes(tokens[i + 2]);
 
                         res = new byte[bytes1.Length + bytes2.Length + bytes3.Length + 1];
 
@@ -306,24 +300,243 @@ namespace Rainbow.Compilation.Assembler {
 
                     break;
                 }
+                case "JMPC": { // TODO: array loo;up
+                    if(tokens[i + 1].type != TokenType.STR) {
+                        throw new InvalidArgumentException($"Invalid argument type {tokens[i + 1].type} at token {i}");
+                    }
+                    if(tokens[i + 2].type != TokenType.STR && tokens[i + 2].type != TokenType.VALUE) {
+                        throw new InvalidArgumentException($"Invalid argument type {tokens[i + 2].type} at token {i}");
+                    }
+                    if(tokens[i + 3].type != TokenType.STR && tokens[i + 3].type != TokenType.VALUE) {
+                        throw new InvalidArgumentException($"Invalid argument type {tokens[i + 3].type} at token {i}");
+                    }
+                    if(tokens[i + 4].type != TokenType.STR && tokens[i + 4].type != TokenType.VALUE) {
+                        throw new InvalidArgumentException($"Invalid argument type {tokens[i + 4].type} at token {i}");
+                    }
+
+                    string v = tokens[i + 1].value;
+                    if(v == "<" || v == ">" || v == "<=" || v == ">=" || v == "==" || v == "!=") {
+                        tokens[i + 1].type = TokenType.CMP;
+                    }
+
+                    bool arg1 = GetArgType(tokens[i + 1]);
+                    bool arg2 = GetArgType(tokens[i + 2]);
+                    bool arg3 = GetArgType(tokens[i + 3]);
+                    bool arg4 = GetArgType(tokens[i + 4]);
+
+                    byte[] bytes1;
+                    byte[] bytes2;
+                    byte[] bytes3;
+                    byte[] bytes4;
+
+                    // F O R M A T T I N G
+                    if(       !arg1 && !arg2 && !arg3 && !arg4) { // REF, REF, REF, REF
+                        bytes1 = StrToBytes(tokens[i + 1].value);
+                        bytes2 = StrToBytes(tokens[i + 2].value);
+                        bytes3 = StrToBytes(tokens[i + 3].value);
+                        bytes4 = StrToBytes(tokens[i + 4].value);
+
+                        res = new byte[bytes1.Length + bytes2.Length + bytes3.Length + bytes4.Length + 1];
+
+                        res[0] = 0x1D;
+                    } else if( arg1 && !arg2 && !arg3 && !arg4) { // IMM, REF, REF, REF
+                        bytes1 = ValToBytes(tokens[i + 1]);
+                        bytes2 = StrToBytes(tokens[i + 2].value);
+                        bytes3 = StrToBytes(tokens[i + 3].value);
+                        bytes4 = StrToBytes(tokens[i + 4].value);
+
+                        res = new byte[bytes1.Length + bytes2.Length + bytes3.Length + bytes4.Length + 1];
+
+                        res[0] = 0x1E;
+                    } else if(!arg1 &&  arg2 && !arg3 && !arg4) { // REF, IMM, REF, REF
+                        bytes1 = StrToBytes(tokens[i + 1].value);
+                        bytes2 = ValToBytes(tokens[i + 2]);
+                        bytes3 = StrToBytes(tokens[i + 3].value);
+                        bytes4 = StrToBytes(tokens[i + 4].value);
+
+                        res = new byte[bytes1.Length + bytes2.Length + bytes3.Length + bytes4.Length + 1];
+
+                        res[0] = 0x1F;
+                    } else if( arg1 &&  arg2 && !arg3 && !arg4) { // IMM, IMM, REF, REF
+                        bytes1 = ValToBytes(tokens[i + 1]);
+                        bytes2 = ValToBytes(tokens[i + 2]);
+                        bytes3 = StrToBytes(tokens[i + 3].value);
+                        bytes4 = StrToBytes(tokens[i + 4].value);
+
+                        res = new byte[bytes1.Length + bytes2.Length + bytes3.Length + bytes4.Length + 1];
+
+                        res[0] = 0x20;
+                    } else if(!arg1 && !arg2 &&  arg3 && !arg4) { // REF, REF, IMM, REF
+                        bytes1 = StrToBytes(tokens[i + 1].value);
+                        bytes2 = StrToBytes(tokens[i + 2].value);
+                        bytes3 = ValToBytes(tokens[i + 3]);
+                        bytes4 = StrToBytes(tokens[i + 4].value);
+
+                        res = new byte[bytes1.Length + bytes2.Length + bytes3.Length + bytes4.Length + 1];
+
+                        res[0] = 0x21;
+                    } else if( arg1 && !arg2 &&  arg3 && !arg4) { // IMM, REF, IMM, REF
+                        bytes1 = ValToBytes(tokens[i + 1]);
+                        bytes2 = StrToBytes(tokens[i + 2].value);
+                        bytes3 = ValToBytes(tokens[i + 3]);
+                        bytes4 = StrToBytes(tokens[i + 4].value);
+
+                        res = new byte[bytes1.Length + bytes2.Length + bytes3.Length + bytes4.Length + 1];
+
+                        res[0] = 0x22;
+                    } else if(!arg1 &&  arg2 &&  arg3 && !arg4) { // REF, IMM, IMM, REF
+                        bytes1 = StrToBytes(tokens[i + 1].value);
+                        bytes2 = ValToBytes(tokens[i + 2]);
+                        bytes3 = ValToBytes(tokens[i + 3]);
+                        bytes4 = StrToBytes(tokens[i + 4].value);
+
+                        res = new byte[bytes1.Length + bytes2.Length + bytes3.Length + bytes4.Length + 1];
+
+                        res[0] = 0x23;
+                    } else if( arg1 &&  arg2 &&  arg3 && !arg4) { // IMM, IMM, IMM, REF
+                        bytes1 = ValToBytes(tokens[i + 1]);
+                        bytes2 = ValToBytes(tokens[i + 2]);
+                        bytes3 = ValToBytes(tokens[i + 3]);
+                        bytes4 = StrToBytes(tokens[i + 4].value);
+
+                        res = new byte[bytes1.Length + bytes2.Length + bytes3.Length + bytes4.Length + 1];
+
+                        res[0] = 0x24;
+                    } else if(!arg1 && !arg2 && !arg3 &&  arg4) { // REF, REF, REF, IMM
+                        bytes1 = StrToBytes(tokens[i + 1].value);
+                        bytes2 = StrToBytes(tokens[i + 2].value);
+                        bytes3 = StrToBytes(tokens[i + 3].value);
+                        bytes4 = ValToBytes(tokens[i + 4]);
+
+                        res = new byte[bytes1.Length + bytes2.Length + bytes3.Length + bytes4.Length + 1];
+
+                        res[0] = 0x25;
+                    } else if( arg1 && !arg2 && !arg3 &&  arg4) { // IMM, REF, REF, IMM
+                        bytes1 = ValToBytes(tokens[i + 1]);
+                        bytes2 = StrToBytes(tokens[i + 2].value);
+                        bytes3 = StrToBytes(tokens[i + 3].value);
+                        bytes4 = ValToBytes(tokens[i + 4]);
+
+                        res = new byte[bytes1.Length + bytes2.Length + bytes3.Length + bytes4.Length + 1];
+
+                        res[0] = 0x26;
+                    } else if(!arg1 &&  arg2 && !arg3 &&  arg4) { // REF, IMM, REF, IMM
+                        bytes1 = StrToBytes(tokens[i + 1].value);
+                        bytes2 = ValToBytes(tokens[i + 2]);
+                        bytes3 = StrToBytes(tokens[i + 3].value);
+                        bytes4 = ValToBytes(tokens[i + 4]);
+
+                        res = new byte[bytes1.Length + bytes2.Length + bytes3.Length + bytes4.Length + 1];
+
+                        res[0] = 0x27;
+                    } else if( arg1 &&  arg2 && !arg3 &&  arg4) { // IMM, IMM, REF, IMM
+                        bytes1 = ValToBytes(tokens[i + 1]);
+                        bytes2 = ValToBytes(tokens[i + 2]);
+                        bytes3 = StrToBytes(tokens[i + 3].value);
+                        bytes4 = ValToBytes(tokens[i + 4]);
+
+                        res = new byte[bytes1.Length + bytes2.Length + bytes3.Length + bytes4.Length + 1];
+
+                        res[0] = 0x28;
+                    } else if(!arg1 && !arg2 &&  arg3 &&  arg4) { // REF, REF, IMM, IMM
+                        bytes1 = StrToBytes(tokens[i + 1].value);
+                        bytes2 = StrToBytes(tokens[i + 2].value);
+                        bytes3 = ValToBytes(tokens[i + 3]);
+                        bytes4 = ValToBytes(tokens[i + 4]);
+
+                        res = new byte[bytes1.Length + bytes2.Length + bytes3.Length + bytes4.Length + 1];
+
+                        res[0] = 0x29;
+                    } else if( arg1 && !arg2 &&  arg3 &&  arg4) { // IMM, REF, IMM, IMM
+                        bytes1 = ValToBytes(tokens[i + 1]);
+                        bytes2 = StrToBytes(tokens[i + 2].value);
+                        bytes3 = ValToBytes(tokens[i + 3]);
+                        bytes4 = ValToBytes(tokens[i + 4]);
+
+                        res = new byte[bytes1.Length + bytes2.Length + bytes3.Length + bytes4.Length + 1];
+
+                        res[0] = 0x2A;
+                    } else if(!arg1 &&  arg2 &&  arg3 &&  arg4) { // REF, IMM, IMM, IMM
+                        bytes1 = StrToBytes(tokens[i + 1].value);
+                        bytes2 = ValToBytes(tokens[i + 2]);
+                        bytes3 = ValToBytes(tokens[i + 3]);
+                        bytes4 = ValToBytes(tokens[i + 4]);
+
+                        res = new byte[bytes1.Length + bytes2.Length + bytes3.Length + bytes4.Length + 1];
+
+                        res[0] = 0x2B;
+                    } else {                                      // IMM, IMM, IMM, IMM
+                        bytes1 = ValToBytes(tokens[i + 1]);
+                        bytes2 = ValToBytes(tokens[i + 2]);
+                        bytes3 = ValToBytes(tokens[i + 3]);
+                        bytes4 = ValToBytes(tokens[i + 4]);
+
+                        res = new byte[bytes1.Length + bytes2.Length + bytes3.Length + bytes4.Length + 1];
+
+                        res[0] = 0x2C;
+                    }
+
+                    int off = 1;
+                    for(int j = 0; j < bytes1.Length; j++, off++) {
+                        res[off] = bytes1[j];
+                    }
+                    for(int j = 0; j < bytes2.Length; j++, off++) {
+                        res[off] = bytes2[j];
+                    }
+                    for(int j = 0; j < bytes3.Length; j++, off++) {
+                        res[off] = bytes3[j];
+                    }
+                    for(int j = 0; j < bytes4.Length; j++, off++) {
+                        res[off] = bytes4[j];
+                    }
+
+                    i += 4;
+
+                    break;
+                }
                 case "CALL": {
                     if(tokens[i + 1].type != TokenType.STR) {
                         throw new InvalidArgumentException($"Invalid argument type {tokens[i + 1].type} at token {i}");
+                    }
+
+                    int index = i + 2;
+
+                    List<byte> bytes = new List<byte>();
+                    while(tokens[index].type == TokenType.STR || tokens[index].type == TokenType.VALUE) {
+                        if(tokens[index].type == TokenType.STR) {
+                            byte[] str = StrToBytes(tokens[index].value);
+                            bytes.Add(0x0F);
+                            foreach(byte b in str) {
+                                bytes.Add(b);
+                            }
+                        } else {
+                            byte[] val = ValToBytes(tokens[index]);
+                            foreach(byte b in val) {
+                                bytes.Add(b);
+                            }
+                        }
+
+                        index++;
                     }
 
                     byte[] bytes1;
 
                     bytes1 = StrToBytes(tokens[i + 1].value);
 
-                    res = new byte[bytes1.Length + 1];
+                    res = new byte[bytes1.Length + 2 + bytes.Count];
                     res[0] = 0x2D;
 
                     int off = 1;
                     for(int j = 0; j < bytes1.Length; j++, off++) {
                         res[off] = bytes1[j];
                     }
+                    res[off] = (byte) (index - (i + 2));
+                    off++;
+                    for(int j = 0; j < bytes.Count; j++, off++) {
+                        res[off] = bytes[j];
+                    }
 
-                    i++;
+                    i += 1 + index - (i + 2);
                     break;
                 }
                 case "RET": {
@@ -380,38 +593,6 @@ namespace Rainbow.Compilation.Assembler {
 
                     break;
                 }
-                case "SYSCALL": { // TODO: deprecated
-                    bool arg1 = GetArgType(tokens[i + 1]);
-                    byte[] bytes1;
-                    byte[] bytes2;
-
-                    bytes2 = StrToBytes(tokens[i + 2].value);
-
-                    if(!arg1) {
-                        bytes1 = StrToBytes(tokens[i + 1].value);
-
-                        res = new byte[bytes1.Length + bytes2.Length + 1];
-
-                        res[0] = 0x3A;
-                    } else {
-                        bytes1 = ValToBytes(tokens[i + 1]);
-
-                        res = new byte[bytes1.Length + bytes2.Length + 1];
-
-                        res[0] = 0x3B;
-                    }
-
-                    int off = 1;
-                    for(int j = 0; j < bytes1.Length; j++, off++) {
-                        res[off] = bytes1[j];
-                    }
-                    for(int j = 0; j < bytes2.Length; j++, off++) {
-                        res[off] = bytes2[j];
-                    }
-
-                    i += 2;
-                    break;
-                }
                 default:
                     throw new UnknownInstrException($"Unknown instruction {instr}");
             }
@@ -422,7 +603,7 @@ namespace Rainbow.Compilation.Assembler {
         // FALSE - REF
         // TRUE  - IMM
         private static bool GetArgType(Token arg) {
-            return arg.type == TokenType.VALUE || arg.type == TokenType.SYSCALL;
+            return arg.type == TokenType.VALUE || arg.type == TokenType.CMP;
         }
 
         private static byte[] StrToBytes(string str) {
@@ -439,8 +620,21 @@ namespace Rainbow.Compilation.Assembler {
         }
 
         private static byte[] ValToBytes(Token val) {
-            if(val.type == TokenType.SYSCALL) {
-                return new byte[] { Lexer.syscalls[val.value] };
+            if(val.type == TokenType.CMP) {
+                switch(val.value) {
+                    case "<":
+                        return new byte[] { 0x00, 0x00 };
+                    case ">":
+                        return new byte[] { 0x00, 0x01 };
+                    case "<=":
+                        return new byte[] { 0x00, 0x02 };
+                    case ">=":
+                        return new byte[] { 0x00, 0x03 };
+                    case "==":
+                        return new byte[] { 0x00, 0x04 };
+                    case "!=":
+                        return new byte[] { 0x00, 0x05 };
+                }
             }
 
             if(val.type != TokenType.VALUE) {

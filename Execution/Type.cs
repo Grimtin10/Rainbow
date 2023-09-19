@@ -16,6 +16,7 @@
             8, // pointer
             1, // struct
             0, // void
+            0, // ref
             0, // undefined
         };  
     }
@@ -36,6 +37,7 @@
         pointer,
         _struct,
         _void,
+        _ref,
         undefined 
     }
 }

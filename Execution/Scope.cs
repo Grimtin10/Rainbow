@@ -1,9 +1,13 @@
 ﻿using Rainbow.Exceptions;
 using Rainbow.Execution.Math;
+using Rainbow.GarbageCollection;
 using Rainbow.GarbageCollection.GCTypes;
 using Rainbow.Handlers;
 using Rainbow.Marshalling;
+using System.Reflection;
 using System.Text;
+using System.Xml.Linq;
+using static System.Formats.Asn1.AsnWriter;
 
 // TODO: split this into multiple files
 namespace Rainbow.Execution {
@@ -60,6 +64,7 @@ namespace Rainbow.Execution {
                         } else {
                             scopes.Add(new Scope(scopeBytes.ToArray(), this));
                         }
+                        scopeBytes.Clear();
                         inFunction = false;
                     }
                     continue;
@@ -108,8 +113,6 @@ namespace Rainbow.Execution {
                                 str[j] = (char) bytes[i];
                             }
 
-                            Console.WriteLine(new string(str));
-
                             i--;
                         }
                     } else {
@@ -117,20 +120,27 @@ namespace Rainbow.Execution {
                     }
                 }
             }
-        }
 
-        public void Execute() {
-            if(parentScope != null) {
-                foreach(KeyValuePair<string, Function> func in parentScope.functions) {
-                    if(!functions.ContainsKey(func.Key)) {
-                        functions.Add(func.Key, func.Value);
-                    }
+            foreach(Scope scope in scopes) {
+                foreach(KeyValuePair<string, Function> func in functions) {
+                    scope.functions.Add(func.Key, func.Value);
+                }
+                foreach(KeyValuePair<string, Instance> var in variables) {
+                    scope.variables.Add(var.Key, var.Value);
                 }
             }
 
+            foreach(Function scope in functions.Values) {
+                foreach(KeyValuePair<string, Function> func in functions) {
+                    scope.scope.functions.Add(func.Key, func.Value);
+                }
+            }
+        }
+
+        public void Execute() {
             stackStart = Globals.GarbageCollector.stack.ptrs.Count;
 
-            for(int i=0; i<instructions.Count;i++) {
+            for(int i = 0; i < instructions.Count; i++) {
                 KeyValuePair<Instruction, byte[]> instruction = instructions[i];
 
                 // if i'm being honest this feels jank but i'm just working with what i have
@@ -182,17 +192,17 @@ namespace Rainbow.Execution {
 
             switch((byte) instr) {
                 case 0x01: {
-                    Instance? arg1 = GetRef(GetSTR(args, ref index));
+                    Instance? arg1 = GetRef(args, ref index);
                     if(arg1 == null) {
                         throw new NullRefException();
                     }
 
-                    Instance? arg2 = GetRef(GetSTR(args, ref index));
+                    Instance? arg2 = GetRef(args, ref index);
                     if(arg2 == null) {
                         throw new NullRefException();
                     }
 
-                    Instance? var = GetRef(GetSTR(args, ref index));
+                    Instance? var = GetRef(args, ref index);
                     if(var == null) {
                         throw new NullRefException();
                     }
@@ -201,7 +211,24 @@ namespace Rainbow.Execution {
                     break;
                 }
                 case 0x02: {
-                    Instance? arg1 = GetRef(GetSTR(args, ref index));
+                    byte type1 = args[index++];
+                    byte[] bytes1 = GetBytes(args, type1, ref index);
+
+                    Instance? arg2 = GetRef(args, ref index);
+                    if(arg2 == null) {
+                        throw new NullRefException();
+                    }
+
+                    Instance? var = GetRef(args, ref index);
+                    if(var == null) {
+                        throw new NullRefException();
+                    }
+
+                    Arithmetic.Add(type1, bytes1, (byte) arg2.type[0], arg2.data.GetBytes(), ref var);
+                    break;
+                }
+                case 0x03: {
+                    Instance? arg1 = GetRef(args, ref index);
                     if(arg1 == null) {
                         throw new NullRefException();
                     }
@@ -209,7 +236,7 @@ namespace Rainbow.Execution {
                     byte type2 = args[index++];
                     byte[] bytes2 = GetBytes(args, type2, ref index);
 
-                    Instance? var = GetRef(GetSTR(args, ref index));
+                    Instance? var = GetRef(args, ref index);
                     if(var == null) {
                         throw new NullRefException();
                     }
@@ -223,7 +250,7 @@ namespace Rainbow.Execution {
                     byte type2 = args[index++];
                     byte[] bytes2 = GetBytes(args, type2, ref index);
 
-                    Instance? var = GetRef(GetSTR(args, ref index));
+                    Instance? var = GetRef(args, ref index);
                     if(var == null) {
                         throw new NullRefException();
                     }
@@ -232,17 +259,17 @@ namespace Rainbow.Execution {
                     break;
                 }
                 case 0x05: {
-                    Instance? arg1 = GetRef(GetSTR(args, ref index));
+                    Instance? arg1 = GetRef(args, ref index);
                     if(arg1 == null) {
                         throw new NullRefException();
                     }
 
-                    Instance? arg2 = GetRef(GetSTR(args, ref index));
+                    Instance? arg2 = GetRef(args, ref index);
                     if(arg2 == null) {
                         throw new NullRefException();
                     }
 
-                    Instance? var = GetRef(GetSTR(args, ref index));
+                    Instance? var = GetRef(args, ref index);
                     if(var == null) {
                         throw new NullRefException();
                     }
@@ -251,7 +278,24 @@ namespace Rainbow.Execution {
                     break;
                 }
                 case 0x06: {
-                    Instance? arg1 = GetRef(GetSTR(args, ref index));
+                    byte type1 = args[index++];
+                    byte[] bytes1 = GetBytes(args, type1, ref index);
+
+                    Instance? arg2 = GetRef(args, ref index);
+                    if(arg2 == null) {
+                        throw new NullRefException();
+                    }
+
+                    Instance? var = GetRef(args, ref index);
+                    if(var == null) {
+                        throw new NullRefException();
+                    }
+
+                    Arithmetic.Sub(type1, bytes1, (byte) arg2.type[0], arg2.data.GetBytes(), ref var);
+                    break;
+                }
+                case 0x07: {
+                    Instance? arg1 = GetRef(args, ref index);
                     if(arg1 == null) {
                         throw new NullRefException();
                     }
@@ -259,29 +303,12 @@ namespace Rainbow.Execution {
                     byte type2 = args[index++];
                     byte[] bytes2 = GetBytes(args, type2, ref index);
 
-                    Instance? var = GetRef(GetSTR(args, ref index));
+                    Instance? var = GetRef(args, ref index);
                     if(var == null) {
                         throw new NullRefException();
                     }
 
                     Arithmetic.Sub((byte) arg1.type[0], arg1.data.GetBytes(), type2, bytes2, ref var);
-                    break;
-                }
-                case 0x07: {
-                    byte type1 = args[index++];
-                    byte[] bytes1 = GetBytes(args, type1, ref index);
-
-                    Instance? arg2 = GetRef(GetSTR(args, ref index));
-                    if(arg2 == null) {
-                        throw new NullRefException();
-                    }
-
-                    Instance? var = GetRef(GetSTR(args, ref index));
-                    if(var == null) {
-                        throw new NullRefException();
-                    }
-
-                    Arithmetic.Sub(type1, bytes1, (byte) arg2.type[0], arg2.data.GetBytes(), ref var);
                     break;
                 }
                 case 0x08: {
@@ -290,7 +317,7 @@ namespace Rainbow.Execution {
                     byte type2 = args[index++];
                     byte[] bytes2 = GetBytes(args, type2, ref index);
 
-                    Instance? var = GetRef(GetSTR(args, ref index));
+                    Instance? var = GetRef(args, ref index);
                     if(var == null) {
                         throw new NullRefException();
                     }
@@ -308,10 +335,39 @@ namespace Rainbow.Execution {
 
                     return Converter.ToInt32(bytes);
                 }
+                case 0x2A: {
+
+                    break;
+                }
                 case 0x2D: { // TODO: argument handling
                     string name = GetSTR(args, ref index);
 
-                    functions[name].Execute();
+                    string[] split = name.Split(".");
+
+                    byte argCount = args[index++];
+                    List<Instance> argList = new List<Instance>();
+                    for(int j = 0; j < argCount; j++) {
+                        switch(args[index++]) {
+                            case 0x0F:
+                                Instance? var = GetRef(args, ref index);
+                                if(var == null) {
+                                    throw new NullRefException();
+                                }
+
+                                argList.Add(var);
+                                break;
+                        }
+                    }
+
+                    if(split[0] == "IO") {
+                        HandleIO(split[1], argList);
+                    } else { 
+                        if(functions.ContainsKey(name)) {
+                            functions[name].Execute();
+                        } else {
+                            throw new UnknownFunctionException($"Unknown function {name}");
+                        }
+                    }
                     break;
                 }
                 case 0x2F: {
@@ -332,11 +388,6 @@ namespace Rainbow.Execution {
                     //Console.WriteLine(type.ToString("X2") + " " + name + " " + Encoding.UTF8.GetString(bytes));
                     break;
                 }
-                case 0x3B: { // SYSCALL_I
-                    byte type = args[index++];
-                    HandleSyscall(type, args, ref index);
-                    break;
-                }
                 case 0x3C: { // VARDEF
                     Type[] type = GetType(args, ref index);
 
@@ -355,7 +406,6 @@ namespace Rainbow.Execution {
         }
 
         public Instance? GetRef(string name) {
-            //Console.WriteLine(name);
             Instance? ret;
             if(!variables.TryGetValue(name, out ret)) {
                 if(parentScope != null) {
@@ -381,19 +431,17 @@ namespace Rainbow.Execution {
             return type;
         }
 
-        private void HandleSyscall(byte type, byte[] args, ref int index) {
-            switch(type) {
-                case 0x00:
-                    Instance? var = GetRef(args, ref index);
-                    if(var == null) throw new NullRefException();
-                    HandleConout(ref var);
+        private void HandleIO(string func, List<Instance> args) {
+            switch(func) {
+                case "println":
+                    println(args[0]);
                     break;
                 default:
-                    throw new UnhandledArgumentException($"Unhandled syscall {type:X2}");
+                    throw new UnknownFunctionException($"Unknown function {func}");
             }
         }
 
-        private void HandleConout(ref Instance var) {
+        private void println(Instance var) {
             byte[] bytes = var.data.GetBytes();
             switch(var.type[0]) {
                 case Type.uint8:
@@ -505,13 +553,13 @@ namespace Rainbow.Execution {
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x02:
-                    GetRefLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x03:
-                    GetTypeLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
+                    GetTypeLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x04:
@@ -525,13 +573,13 @@ namespace Rainbow.Execution {
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x06:
-                    GetRefLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x07:
-                    GetTypeLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
+                    GetTypeLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x08:
@@ -542,16 +590,20 @@ namespace Rainbow.Execution {
                 case 0x09:
                     GetRefLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x0A:
                     GetTypeLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x0B:
                     GetRefLength(bytes, i, ref len, ref offset);
+                    GetTypeLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x0C:
+                    GetTypeLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
@@ -561,13 +613,13 @@ namespace Rainbow.Execution {
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x0E:
-                    GetRefLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x0F:
-                    GetTypeLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
+                    GetTypeLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x10:
@@ -581,13 +633,13 @@ namespace Rainbow.Execution {
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x12:
-                    GetRefLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x13:
-                    GetTypeLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
+                    GetTypeLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x14:
@@ -601,13 +653,13 @@ namespace Rainbow.Execution {
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x16:
-                    GetRefLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x17:
-                    GetTypeLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
+                    GetTypeLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x18:
@@ -636,34 +688,34 @@ namespace Rainbow.Execution {
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x1E:
-                    GetRefLength(bytes, i, ref len, ref offset);
-                    GetRefLength(bytes, i, ref len, ref offset);
-                    GetRefLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x1F:
                     GetRefLength(bytes, i, ref len, ref offset);
-                    GetRefLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x20:
-                    GetRefLength(bytes, i, ref len, ref offset);
-                    GetRefLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x21:
                     GetRefLength(bytes, i, ref len, ref offset);
-                    GetTypeLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
+                    GetTypeLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x22:
-                    GetRefLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x23:
                     GetRefLength(bytes, i, ref len, ref offset);
@@ -672,16 +724,16 @@ namespace Rainbow.Execution {
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x24:
+                    GetTypeLength(bytes, i, ref len, ref offset);
+                    GetTypeLength(bytes, i, ref len, ref offset);
+                    GetTypeLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
-                    GetTypeLength(bytes, i, ref len, ref offset);
-                    GetTypeLength(bytes, i, ref len, ref offset);
-                    GetTypeLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x25:
+                    GetRefLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
-                    GetRefLength(bytes, i, ref len, ref offset);
-                    GetRefLength(bytes, i, ref len, ref offset);
-                    GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x26:
                     GetTypeLength(bytes, i, ref len, ref offset);
@@ -690,34 +742,34 @@ namespace Rainbow.Execution {
                     GetTypeLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x27:
-                    GetTypeLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
+                    GetTypeLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x28:
                     GetTypeLength(bytes, i, ref len, ref offset);
-                    GetRefLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
+                    GetRefLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x29:
-                    GetTypeLength(bytes, i, ref len, ref offset);
-                    GetTypeLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
+                    GetTypeLength(bytes, i, ref len, ref offset);
+                    GetTypeLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x2A:
                     GetTypeLength(bytes, i, ref len, ref offset);
-                    GetTypeLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
+                    GetTypeLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x2B:
-                    GetTypeLength(bytes, i, ref len, ref offset);
-                    GetTypeLength(bytes, i, ref len, ref offset);
-                    GetTypeLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
+                    GetTypeLength(bytes, i, ref len, ref offset);
+                    GetTypeLength(bytes, i, ref len, ref offset);
+                    GetTypeLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x2C:
                     GetTypeLength(bytes, i, ref len, ref offset);
@@ -725,8 +777,16 @@ namespace Rainbow.Execution {
                     GetTypeLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
                     break;
-                case 0x2D: // it's complicated
+                case 0x2D:
                     GetRefLength(bytes, i, ref len, ref offset);
+
+                    len++;
+
+                    byte argCount = bytes[i + offset];
+                    offset++;
+                    for(int j = 0; j < argCount; j++) {
+                        GetArgLength(bytes, i, ref len, ref offset);
+                    }
                     break;
                 case 0x2E:
                     GetRefLength(bytes, i, ref len, ref offset);
@@ -828,6 +888,19 @@ namespace Rainbow.Execution {
             }
 
             return new KeyValuePair<Instruction, byte[]>((Instruction) instr, args);
+        }
+
+        public void GetArgLength(byte[] bytes, int i, ref byte len, ref int offset) {
+            byte type = bytes[i + offset];
+
+            len++;
+            offset++;
+
+            if(type == 0x0F) {
+                GetRefLength(bytes, i, ref len, ref offset);
+            } else {
+                GetTypeLength(bytes, i, ref len, ref offset);
+            }
         }
 
         public void GetTypeLength(byte[] bytes, int i, ref byte len, ref int offset) {

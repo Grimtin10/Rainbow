@@ -1,17 +1,11 @@
 ; this subtracts numbers *forever*
 VARDEF int32 $res
-VARDEF int32 $res2
 SUB 1, 0, $res
-SYSCALL CONOUT $res
+CALL IO.println $res
 
+; TODO: char* brokey
 uint32 main(char args) {
-	CALL doStuff
-	RET 0
-}
-
-void doStuff() {
-	SUB 0, $res, $res2
-	SUB $res2, $res, $res
-	SYSCALL CONOUT $res
+	ADD 1, $res, $res
+	JMPC <, $res, 10, 0
 	RET 0
 }
