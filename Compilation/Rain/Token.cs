@@ -19,6 +19,7 @@ public enum TokenType
     STRING,
     CHAR,
     NUMERIC,
+    DNUMERIC,
     OPSTAR,
     OPPLUS,
     OPMINUS,
@@ -32,9 +33,14 @@ public enum TokenType
     FIXED,
     SWITCH,
     CASE,
-    FALLBACK,
     DEFAULT,
     OPAND,
     OPNULL,
-    OPNOT
+    OPNOT,
+    UNSAFE,
+    RUNTIME,
+    TEMPLATE,
+    PRIVATE,
+    READONLY,
+    FOR
 }

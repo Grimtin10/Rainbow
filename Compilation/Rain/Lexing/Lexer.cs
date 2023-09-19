@@ -19,44 +19,11 @@ public class Lexer
         {
             switch(document[i])
             {
-                case ' ':
-                {
-                    if(current.Length > 0)
-                    {
-                        long numeric;
-                        if(long.TryParse(current, out numeric))
-                        {
-                            tokens.Add(new Token(current, TokenType.NUMERIC, new string[0]));
-
-                            current = "";
-
-                            break;
-                        }
-
-                        tokens.Add(new Token(current, TokenType.WORD, new string[0]));
-                        current = "";
-                    }
-
-                    break;
-                }
+                case ' ': case '\n': case '\t': ParseCurrent(ref current); break;
 
                 case '\'':
                 {
-                    if(current.Length > 0)
-                    {
-                        long numeric;
-                        if(long.TryParse(current, out numeric))
-                        {
-                            tokens.Add(new Token(current, TokenType.NUMERIC, new string[0]));
-
-                            current = "";
-
-                            break;
-                        }
-
-                        tokens.Add(new Token(current, TokenType.WORD, new string[0]));
-                        current = "";
-                    }
+                    ParseCurrent(ref current);
 
                     //add character reading logic
 
@@ -65,21 +32,7 @@ public class Lexer
 
                 case '\"':
                 {
-                    if(current.Length > 0)
-                    {
-                        long numeric;
-                        if(long.TryParse(current, out numeric))
-                        {
-                            tokens.Add(new Token(current, TokenType.NUMERIC, new string[0]));
-
-                            current = "";
-
-                            break;
-                        }
-
-                        tokens.Add(new Token(current, TokenType.WORD, new string[0]));
-                        current = "";
-                    }
+                    ParseCurrent(ref current);
 
                     //add character reading logic
 
@@ -92,6 +45,37 @@ public class Lexer
                     break;
                 }
             }
+        }
+    }
+
+    private void ParseCurrent(ref string current)
+    {
+        if(current.Length > 0)
+        {
+            decimal dnumeric;
+            long numeric;
+            if(long.TryParse(current, out numeric))
+            {
+                tokens.Add(new Token(current, TokenType.NUMERIC, new string[0]));
+
+                current = "";
+
+                return;
+            }
+
+            if(decimal.TryParse(current, out dnumeric))
+            {
+                tokens.Add(new Token(current, TokenType.DNUMERIC, new string[0]));
+
+                current = "";
+
+                return;
+            }
+
+            switch(current) { default: break; }
+
+            tokens.Add(new Token(current, TokenType.WORD, new string[0]));
+            current = "";
         }
     }
 }
