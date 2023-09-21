@@ -9,5 +9,6 @@
         LPAREN,
         RPAREN,
         CMP,
+        LABEL,
     }
 }

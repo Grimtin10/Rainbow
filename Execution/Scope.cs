@@ -336,6 +336,29 @@ namespace Rainbow.Execution {
                     return Converter.ToInt32(bytes);
                 }
                 case 0x2A: {
+                    byte cmp = args[index++];
+
+                    Instance? var1 = GetRef(args, ref index);
+                    if(var1 == null) {
+                        throw new NullRefException();
+                    }
+
+                    byte type1 = (byte)var1.type[0];
+                    byte[] bytes1 = var1.data.GetBytes();
+
+                    byte type2 = args[index++];
+                    byte[] bytes2 = GetBytes(args, type2, ref index);
+
+                    byte type3 = args[index++];
+                    byte[] bytes3 = GetBytes(args, type3, ref index);
+
+                    if(type3 != 0x06) {
+                        throw new InvalidArgumentException("JMPC expects int32 as arg 4");
+                    }
+
+                    if(Comparison.Compare(type1, bytes1, type2, bytes2, cmp)) {
+                        return Converter.ToInt32(bytes3);
+                    }
 
                     break;
                 }
@@ -486,7 +509,7 @@ namespace Rainbow.Execution {
                     Console.WriteLine(conv.ToChar(bytes));
                     break;
                 default:
-                    throw new UnsupportedException("Attempted to CONOUT var with unknown type " + var.type);
+                    throw new UnsupportedException("Attempted to println var with unknown type " + var.type);
             }
         }
 
@@ -688,7 +711,8 @@ namespace Rainbow.Execution {
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x1E:
-                    GetTypeLength(bytes, i, ref len, ref offset);
+                    offset++;
+                    len++;
                     GetRefLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
@@ -700,7 +724,8 @@ namespace Rainbow.Execution {
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x20:
-                    GetTypeLength(bytes, i, ref len, ref offset);
+                    offset++;
+                    len++;
                     GetTypeLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
@@ -712,7 +737,8 @@ namespace Rainbow.Execution {
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x22:
-                    GetTypeLength(bytes, i, ref len, ref offset);
+                    offset++;
+                    len++;
                     GetRefLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
@@ -724,7 +750,8 @@ namespace Rainbow.Execution {
                     GetRefLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x24:
-                    GetTypeLength(bytes, i, ref len, ref offset);
+                    offset++;
+                    len++;
                     GetTypeLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
@@ -736,7 +763,8 @@ namespace Rainbow.Execution {
                     GetTypeLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x26:
-                    GetTypeLength(bytes, i, ref len, ref offset);
+                    offset++;
+                    len++;
                     GetRefLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
@@ -748,7 +776,8 @@ namespace Rainbow.Execution {
                     GetTypeLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x28:
-                    GetTypeLength(bytes, i, ref len, ref offset);
+                    offset++;
+                    len++;
                     GetTypeLength(bytes, i, ref len, ref offset);
                     GetRefLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
@@ -760,7 +789,8 @@ namespace Rainbow.Execution {
                     GetTypeLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x2A:
-                    GetTypeLength(bytes, i, ref len, ref offset);
+                    offset++;
+                    len++;
                     GetRefLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
@@ -772,7 +802,8 @@ namespace Rainbow.Execution {
                     GetTypeLength(bytes, i, ref len, ref offset);
                     break;
                 case 0x2C:
-                    GetTypeLength(bytes, i, ref len, ref offset);
+                    offset++;
+                    len++;
                     GetTypeLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);
                     GetTypeLength(bytes, i, ref len, ref offset);

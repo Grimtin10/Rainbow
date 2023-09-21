@@ -80,6 +80,8 @@ namespace Rainbow.Compilation.Assembler {
                 return new Token(TokenType.LPAREN, input);
             } else if(input.Equals(")")) {
                 return new Token(TokenType.RPAREN, input);
+            } else if(input.StartsWith(":")) {
+                return new Token(TokenType.LABEL, input);
             } else { // if you dont know what it is, it might be a string
                 return new Token(TokenType.STR, input);
             }

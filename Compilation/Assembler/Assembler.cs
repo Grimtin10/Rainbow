@@ -17,11 +17,13 @@ namespace Rainbow.Compilation.Assembler {
             List<Token> tokens = Lexer.Lex(asm);
 
             Dictionary<string, FuncDef> funcs = new();
+            Dictionary<string, int> labels = new();
 
             bool inFuncDef = false;
-            string funcName = ""; // for error purposes
+            string funcName = "";
             int funcOffset = 0;
             uint byteCount = 0;
+            int instrCount = 0;
 
             for(int i = 0; i < tokens.Count; i++) {
                 if(inFuncDef) {
@@ -45,11 +47,20 @@ namespace Rainbow.Compilation.Assembler {
                     if(tokens[i + 2].type == TokenType.LPAREN) {
                         inFuncDef = true;
                         funcName = "";
+                        instrCount = 0;
                     }
                 }
 
                 if(tokens[i].type == TokenType.LBRACKET) {
                     inFuncDef = false;
+                }
+
+                if(tokens[i].type == TokenType.INSTR) {
+                    instrCount++;
+                }
+
+                if(tokens[i].type == TokenType.LABEL) {
+                    tokens[i].type = TokenType.VALUE;
                 }
             }
 
@@ -603,7 +614,7 @@ namespace Rainbow.Compilation.Assembler {
         // FALSE - REF
         // TRUE  - IMM
         private static bool GetArgType(Token arg) {
-            return arg.type == TokenType.VALUE || arg.type == TokenType.CMP;
+            return arg.type == TokenType.VALUE || arg.type == TokenType.CMP || arg.type == TokenType.LABEL;
         }
 
         private static byte[] StrToBytes(string str) {
@@ -623,17 +634,17 @@ namespace Rainbow.Compilation.Assembler {
             if(val.type == TokenType.CMP) {
                 switch(val.value) {
                     case "<":
-                        return new byte[] { 0x00, 0x00 };
+                        return new byte[] { 0x00 };
                     case ">":
-                        return new byte[] { 0x00, 0x01 };
+                        return new byte[] { 0x01 };
                     case "<=":
-                        return new byte[] { 0x00, 0x02 };
+                        return new byte[] { 0x02 };
                     case ">=":
-                        return new byte[] { 0x00, 0x03 };
+                        return new byte[] { 0x03 };
                     case "==":
-                        return new byte[] { 0x00, 0x04 };
+                        return new byte[] { 0x04 };
                     case "!=":
-                        return new byte[] { 0x00, 0x05 };
+                        return new byte[] { 0x05 };
                 }
             }
 
