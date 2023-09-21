@@ -16,6 +16,7 @@ Rain language mockups for version 1
   - [Methods](#methods)
     - [Static Class Methods](#static-class-methods)
     - [Private Methods](#private-methods)
+    - [Implicit Returns](#implicit-returns)
 - [IL](#il-intrinsic-see-intrisic-types-and-methods)
 - [Pointers and Reference Types](#pointers-and-reference-types)
   - [Ref](#ref)
@@ -403,6 +404,39 @@ define myModule;
 private int GetInt()
 {
     return 5;
+}
+```
+
+### Implicit Returns
+Rainunderstands that having to declare a return
+variable can get annoying when writing a lot of
+different functions. So implicit returns *ar* supported!
+
+Under the hood Rain creates a variable that is accessible
+from ``return``. You do not have to explicitely return this
+variable because Rain automatically returns it for you!
+
+```cs
+int GetInt()
+{
+    return = 5;
+}
+```
+
+However, in cases like the following, Rain will refrain from
+declaring this variable (in order to save memory):
+
+```cs
+int GetInt()
+{
+    return 5;
+}
+```
+```cs
+int GetInt()
+{
+    int ret = 5;
+    return ret;s
 }
 ```
 
